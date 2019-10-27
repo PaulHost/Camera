@@ -1,6 +1,6 @@
 @file:Suppress("unused")
 
-package paul.host.camera.service
+package paul.host.camera.util
 
 import android.content.ComponentName
 import android.content.Context
@@ -13,7 +13,9 @@ object ServiceManager {
     private val services: MutableMap<String, Binder> = mutableMapOf()
 
     fun bind(context: Context, service: Class<*>) = service.simpleName.let {
-        services[it]?.bind() ?: services.put(it, Binder(context, service))
+        services[it]?.bind() ?: services.put(it,
+            Binder(context, service)
+        )
         this
     }
 

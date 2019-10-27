@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import paul.host.camera.ui.ShotActivity
+import paul.host.camera.util.ServiceManager
 
 
 abstract class TimeLapseService(name: String) : IntentService(name) {
@@ -20,7 +21,7 @@ abstract class TimeLapseService(name: String) : IntentService(name) {
 
     init {
         Log.d(this::class.java.simpleName, "MY_LOG: init")
-        handler.postDelayed(takePicture(), period)
+        handler.postDelayed(takePicture(), 1000)
     }
 
     override fun onHandleIntent(intent: Intent?) {
@@ -42,7 +43,7 @@ abstract class TimeLapseService(name: String) : IntentService(name) {
         }
     }
 
-    private fun endTime() = startTime + (period * 5)
+    private fun endTime() = startTime + (period * 50)
 
     companion object {
         const val EXTRA_PERIOD = "EXTRA_PERIOD"

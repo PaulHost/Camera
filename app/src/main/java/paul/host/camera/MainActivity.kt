@@ -3,7 +3,7 @@ package paul.host.camera
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import paul.host.camera.service.LongExposureService
-import paul.host.camera.service.ServiceManager
+import paul.host.camera.util.ServiceManager
 
 class MainActivity : AppCompatActivity() {
 
