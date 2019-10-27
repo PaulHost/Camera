@@ -50,14 +50,10 @@ open class ShotFragment : Fragment(), LifecycleOwner {
         viewFinder = findViewById(R.id.texture_view_finder)
 
         // Request camera permissions
-        if (allPermissionsGranted()) {
-            viewFinder.post { startCamera() }
-        } else {
-            this@ShotFragment.activity?.let {
-                ActivityCompat.requestPermissions(
-                    it, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
-                )
-            }
+        if (allPermissionsGranted()) viewFinder.post {
+            startCamera()
+        } else this@ShotFragment.activity?.let {
+            ActivityCompat.requestPermissions(it, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
 
         // Every time the provided texture view changes, recompute layout
@@ -82,26 +78,7 @@ open class ShotFragment : Fragment(), LifecycleOwner {
     }
 
     private fun startCamera() {
-        // Create configuration object for the viewfinder use case
-        val previewConfig = PreviewConfig.Builder().apply {
-            setTargetResolution(Size(720, 1280))
-        }.build()
-
-        // Build the viewfinder use case
-        val preview = Preview(previewConfig)
-
-        // Every time the viewfinder is updated, recompute layout
-        preview.setOnPreviewOutputUpdateListener {
-            // To update the SurfaceTexture, we have to remove it and re-add it
-            val parent = viewFinder.parent as ViewGroup
-            parent.removeView(viewFinder)
-            parent.addView(viewFinder, 0)
-
-            viewFinder.surfaceTexture = it.surfaceTexture
-            updateTransform()
-        }
-
-        CameraX.bindToLifecycle(this, preview, imageCapture)
+        CameraX.bindToLifecycle(this, preview(), imageCapture)
     }
 
     fun takePicture(name: String = "${System.currentTimeMillis()}") = takePicture(
@@ -154,6 +131,24 @@ open class ShotFragment : Fragment(), LifecycleOwner {
         // Finally, apply transformations to our TextureView
         viewFinder.setTransform(matrix)
     }
+
+    private fun preview() = Preview(
+        PreviewConfig.Builder().apply {
+            setTargetResolution(previewTargetResolution())
+        }.build()
+    ).apply {
+        setOnPreviewOutputUpdateListener {
+            // To update the SurfaceTexture, we have to remove it and re-add it
+            val parent = viewFinder.parent as ViewGroup
+            parent.removeView(viewFinder)
+            parent.addView(viewFinder, 0)
+
+            viewFinder.surfaceTexture = it.surfaceTexture
+            updateTransform()
+        }
+    }
+
+    private fun previewTargetResolution() = Size(viewFinder.width / 2, viewFinder.height / 2)
 
     /**
      * Process result from permission request dialog box, has the request

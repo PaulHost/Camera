@@ -13,7 +13,7 @@ abstract class TimeLapseService(name: String) : IntentService(name) {
     private var handler: Handler = Handler(Looper.getMainLooper())
     private var startTime = System.currentTimeMillis()
 
-    var period: Long = 20000
+    var period: Long = 30000
         set(minutes) {
             minutes * (60000)
             field = minutes
