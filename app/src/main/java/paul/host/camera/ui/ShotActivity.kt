@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import paul.host.camera.R
-import paul.host.camera.util.WakeUpManager
 
 
 class ShotActivity : AppCompatActivity() {
@@ -16,14 +15,14 @@ class ShotActivity : AppCompatActivity() {
         super.onAttachedToWindow()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(true)
-        } else {
-            window.addFlags(
-                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
-                        or WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                        or WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-            )
         }
-        WakeUpManager.wakeUp(applicationContext)
+        window.addFlags(
+            WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+                    or WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                    or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                    or WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+        )
+//        WakeUpManager.wakeUp(applicationContext)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
