@@ -30,7 +30,9 @@ abstract class TimeLapseService(name: String) : IntentService(name) {
         handler.postDelayed(takePicture(), period)
     }
 
-    open fun takeShotIntent() = ShotActivity.getIntent(applicationContext)
+    open fun takeShotIntent() = ShotActivity.getIntent(applicationContext).apply {
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_USER_ACTION
+    }
 
     private fun takePicture(): Runnable = Runnable {
         if (System.currentTimeMillis() < endTime()) {
@@ -43,7 +45,7 @@ abstract class TimeLapseService(name: String) : IntentService(name) {
         }
     }
 
-    private fun endTime() = startTime + (period * 50)
+    private fun endTime() = startTime + (period * 181)
 
     companion object {
         const val EXTRA_PERIOD = "EXTRA_PERIOD"
