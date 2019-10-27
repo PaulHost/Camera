@@ -48,13 +48,13 @@ object ServiceManager {
 
             override fun onServiceConnected(className: ComponentName, service: IBinder) {
                 isServiceBound = true
-                Log.d(service.javaClass.simpleName, "connected")
+                Log.d(service.javaClass.simpleName, "MY_LOG: connected")
 
             }
 
             override fun onServiceDisconnected(arg0: ComponentName) {
                 isServiceBound = false
-                Log.d(service.simpleName, "disconnected")
+                Log.d(service.simpleName, "MY_LOG: disconnected")
             }
         }
 
@@ -63,7 +63,7 @@ object ServiceManager {
         }
 
         fun bind() {
-            Log.d(service.simpleName, "binding")
+            Log.d(service.simpleName, "MY_LOG: binding")
             if (!isServiceBound) context.bindService(
                 Intent(context, service),
                 serviceConnection,
@@ -73,7 +73,7 @@ object ServiceManager {
         }
 
         fun unbind() {
-            Log.d(service.simpleName, "unbinding")
+            Log.d(service.simpleName, "MY_LOG: unbinding")
             if (isServiceBound) context.unbindService(serviceConnection)
         }
 

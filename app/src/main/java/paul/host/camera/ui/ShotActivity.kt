@@ -8,11 +8,17 @@ import paul.host.camera.R
 
 class ShotActivity : AppCompatActivity() {
 
-//    TODO: Camera implementation should be here
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.long_exposure_activity)
+        setContentView(R.layout.shot_activity)
+        when (intent.getStringExtra(EXTRA_LONG_EXPOSURE_SHOT)) {
+            null -> supportFragmentManager.beginTransaction()
+                .replace(
+                    R.id.shot_activity_content,
+                    ShotFragment.getInstance()
+                ).commit()
+
+        }
     }
 
     companion object {
