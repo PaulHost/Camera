@@ -3,7 +3,7 @@ package paul.host.camera
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import paul.host.camera.service.LongExposureService
-import paul.host.camera.service.ServiceManager
+import paul.host.camera.util.ServiceManager
 
 class MainActivity : AppCompatActivity() {
 
@@ -14,6 +14,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        ServiceManager.bind(applicationContext, LongExposureService::class.java)
+        ServiceManager.start(applicationContext, LongExposureService::class.java)
     }
 }
