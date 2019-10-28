@@ -5,7 +5,7 @@ package paul.host.camera.util
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import paul.host.camera.Constants
+import paul.host.camera.data.Constants
 
 object ServiceManager {
     private val SERVICES: MutableMap<String, ServiceWrapper> = mutableMapOf()

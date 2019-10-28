@@ -10,7 +10,7 @@ import android.os.IBinder
 import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import paul.host.camera.Constants
+import paul.host.camera.data.Constants
 import paul.host.camera.ui.ShotActivity
 import paul.host.camera.util.ServiceManager
 
