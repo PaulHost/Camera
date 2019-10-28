@@ -14,6 +14,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        ServiceManager.bind(applicationContext, LongExposureService::class.java)
+        ServiceManager.start(applicationContext, LongExposureService::class.java)
     }
 }

@@ -1,6 +1,6 @@
 package paul.host.camera.ui
 
-import android.Manifest
+import  android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Matrix
 import android.os.Bundle
@@ -30,7 +30,7 @@ private val REQUIRED_PERMISSIONS = arrayOf(
     Manifest.permission.DISABLE_KEYGUARD
 )
 
-open class ShotFragment : Fragment(), LifecycleOwner {
+open class ShotFragment : Fragment(), LifecycleOwner, ImageCapture.OnImageSavedListener {
 
     private lateinit var viewFinder: TextureView
     private val _handler = Handler(Looper.getMainLooper())
@@ -65,51 +65,48 @@ open class ShotFragment : Fragment(), LifecycleOwner {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d(this::class.java.simpleName, "MY_LOG: onViewCreated")
-        _handler.postDelayed(cameraReadyDalay(), 1000)
+        _handler.postDelayed(cameraReadyDaley(), 1000)
     }
 
-    fun cameraReadyDalay(): Runnable = Runnable {
-        _handler.removeCallbacks(cameraReadyDalay())
+    override fun onImageSaved(file: File) {
+        Log.d(this::class.java.simpleName, "MY_LOG: Photo capture succeeded: ${file.absolutePath}")
+        viewFinder.post {
+            activity?.finish()
+        }
+    }
+
+    override fun onError(
+        imageCaptureError: ImageCapture.ImageCaptureError,
+        message: String,
+        exc: Throwable?
+    ) {
+        Log.e(this::class.java.simpleName, "MY_LOG: Photo capture failed: $message")
+        viewFinder.post {
+            activity?.finish()
+        }
+    }
+
+    open fun cameraReadyDaley(): Runnable = Runnable {
+        _handler.removeCallbacks(cameraReadyDaley())
         if (CameraX.isBound(imageCapture)) {
             takePicture()
         } else {
-            _handler.postDelayed(cameraReadyDalay(), 1000)
+            _handler.postDelayed(cameraReadyDaley(), 1000)
         }
     }
+
+    fun takePicture() = takePicture(
+        File(
+            activity?.externalMediaDirs?.first(),
+            "${arguments?.get(ARG_PICTURE_NAME) ?: System.currentTimeMillis()}.jpg"
+        )
+    )
+
+    fun takePicture(file: File) = imageCapture.takePicture(file, executor, this)
 
     private fun startCamera() {
         CameraX.bindToLifecycle(this, preview(), imageCapture)
     }
-
-    fun takePicture(name: String = "${System.currentTimeMillis()}") = takePicture(
-        File(
-            activity?.externalMediaDirs?.first(),
-            "${name}.jpg"
-        )
-    )
-
-    fun takePicture(file: File) = imageCapture.takePicture(file, executor,
-        object : ImageCapture.OnImageSavedListener {
-            override fun onError(
-                imageCaptureError: ImageCapture.ImageCaptureError,
-                message: String,
-                exc: Throwable?
-            ) {
-                Log.e(this::class.java.simpleName, "MY_LOG: Photo capture failed: $message")
-                viewFinder.post {
-                    activity?.finish()
-                }
-            }
-
-            override fun onImageSaved(file: File) {
-                val msg = "Photo capture succeeded: ${file.absolutePath}"
-                Log.d(this::class.java.simpleName, "MY_LOG: $msg")
-                viewFinder.post {
-                    activity?.finish()
-                }
-            }
-        }
-    )
 
     private fun updateTransform() {
         val matrix = Matrix()
@@ -132,28 +129,24 @@ open class ShotFragment : Fragment(), LifecycleOwner {
         viewFinder.setTransform(matrix)
     }
 
-    private fun preview() = Preview(
-        PreviewConfig.Builder().apply {
-            setTargetResolution(previewTargetResolution())
-        }.build()
-    ).apply {
-        setOnPreviewOutputUpdateListener {
+    open fun preview() = PreviewConfig.Builder().apply {
+        setTargetResolution(previewTargetResolution())
+    }.build().let { config ->
+        val preview = Preview(config)
+        preview.setOnPreviewOutputUpdateListener { output ->
             // To update the SurfaceTexture, we have to remove it and re-add it
             val parent = viewFinder.parent as ViewGroup
             parent.removeView(viewFinder)
             parent.addView(viewFinder, 0)
 
-            viewFinder.surfaceTexture = it.surfaceTexture
+            viewFinder.surfaceTexture = output.surfaceTexture
             updateTransform()
         }
+        preview
     }
 
     private fun previewTargetResolution() = Size(viewFinder.width / 2, viewFinder.height / 2)
 
-    /**
-     * Process result from permission request dialog box, has the request
-     * been granted? If yes, start Camera. Otherwise display a toast
-     */
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>, grantResults: IntArray
     ) {
@@ -167,9 +160,6 @@ open class ShotFragment : Fragment(), LifecycleOwner {
         }
     }
 
-    /**
-     * Check if all permission specified in the manifest have been granted
-     */
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
             requireContext(), it
@@ -177,7 +167,12 @@ open class ShotFragment : Fragment(), LifecycleOwner {
     }
 
     companion object {
-        fun getInstance() = ShotFragment()
+        private const val ARG_PICTURE_NAME = "ARG_PICTURE_NAME"
+        fun getInstance(name: String? = null) = ShotFragment().apply {
+            arguments = Bundle().apply {
+                putString(ARG_PICTURE_NAME, name)
+            }
+        }
     }
 }
 

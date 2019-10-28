@@ -2,82 +2,71 @@
 
 package paul.host.camera.util
 
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
-import android.os.IBinder
 import android.util.Log
+import paul.host.camera.Constants
 
 object ServiceManager {
-    private val services: MutableMap<String, Binder> = mutableMapOf()
+    private val SERVICES: MutableMap<String, ServiceWrapper> = mutableMapOf()
 
-    fun bind(context: Context, service: Class<*>) = service.simpleName.let {
-        services[it]?.bind() ?: services.put(it,
-            Binder(context, service)
+    fun start(context: Context, service: Class<*>) = service.simpleName.let {
+        SERVICES[it]?.start() ?: SERVICES.put(
+            it,
+            ServiceWrapper(context, service)
         )
         this
     }
 
-    fun bind(context: Context, serviceList: List<Class<*>>) {
+    fun start(context: Context, serviceList: List<Class<*>>) {
         serviceList.forEach {
-            bind(context, it)
+            start(context, it)
         }
     }
 
-    fun unbind(service: Class<*>) = service.simpleName.let {
-        services[it]?.unbind()
-        services.remove(it)
+    fun stop(service: Class<*>) = service.simpleName.let {
+        SERVICES[it]?.stop()
+        SERVICES.remove(it)
         this
     }
 
-    fun unbind(serviceList: List<Class<*>>) {
+    fun stop(serviceList: List<Class<*>>) {
         serviceList.forEach {
-            unbind(it)
+            stop(it)
         }
     }
 
-    fun unbindAll() {
-        services.values.forEach {
-            unbind(it.service)
+    fun stopAll() {
+        SERVICES.values.forEach {
+            stop(it.service)
         }
     }
 
-    private class Binder(val context: Context, val service: Class<*>) {
+    private class ServiceWrapper(val context: Context, val service: Class<*>) {
         var isServiceBound = false
 
-        private val serviceConnection = object : ServiceConnection {
-
-            override fun onServiceConnected(className: ComponentName, service: IBinder) {
-                isServiceBound = true
-                Log.d(service.javaClass.simpleName, "MY_LOG: connected")
-
-            }
-
-            override fun onServiceDisconnected(arg0: ComponentName) {
-                isServiceBound = false
-                Log.d(service.simpleName, "MY_LOG: disconnected")
-            }
-        }
+        var intent = Intent(context, service)
 
         init {
-            bind()
+            start()
         }
 
-        fun bind() {
-            Log.d(service.simpleName, "MY_LOG: binding")
-            if (!isServiceBound) context.bindService(
-                Intent(context, service),
-                serviceConnection,
-                Context.BIND_AUTO_CREATE
-            )
-            isServiceBound = true
+        fun start() {
+            Log.d(service.simpleName, "MY_LOG: start")
+            if (!isServiceBound) {
+                intent.action = Constants.ACTION.START_FOREGROUND_ACTION
+                context.startService(intent)
+                isServiceBound = true
+            }
         }
 
-        fun unbind() {
-            Log.d(service.simpleName, "MY_LOG: unbinding")
-            if (isServiceBound) context.unbindService(serviceConnection)
+        fun stop() {
+            Log.d(service.simpleName, "MY_LOG: stop")
+            if (isServiceBound) {
+                intent.action = Constants.ACTION.STOP_FOREGROUND_ACTION
+                context.stopService(intent)
+                isServiceBound = false
+            }
         }
-
     }
 }
