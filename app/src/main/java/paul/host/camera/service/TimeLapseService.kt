@@ -8,17 +8,17 @@ import android.graphics.BitmapFactory
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import android.util.Log
 import androidx.core.app.NotificationCompat
-import paul.host.camera.Constants
+import paul.host.camera.common.Constants
+import paul.host.camera.common.util.ServiceManager
 import paul.host.camera.ui.ShotActivity
-import paul.host.camera.util.ServiceManager
+import timber.log.Timber
 
 
-abstract class TimeLapseService(private val name: String) : Service() {
+abstract class TimeLapseService(private val name: String) : Service(), Runnable {
     private var handler: Handler = Handler(Looper.getMainLooper())
     private var startTime = System.currentTimeMillis()
-    private var count = 5
+    private var count = 50
     private var endTime = 0L
     private var period: Long = 24000
         set(minutes) {
@@ -27,13 +27,25 @@ abstract class TimeLapseService(private val name: String) : Service() {
         }
 
     override fun onBind(intent: Intent?): IBinder? {
-        Log.d(name, "MY_LOG: onBind")
-        onHandleIntent(intent)
+        Timber.d("MY_LOG: onBind")
         return null
     }
 
+    override fun run() {
+        Timber.d("MY_LOG: takePicture")
+        if (System.currentTimeMillis() < endTime) {
+            handler.removeCallbacks(this)
+            Timber.d("MY_LOG: opening ShotActivity")
+            startActivity(takeShotIntent())
+            handler.postDelayed(this, period)
+        } else {
+            Timber.d("MY_LOG: stop")
+            ServiceManager.stop(this::class.java)
+        }
+    }
+
     open fun onHandleIntent(intent: Intent?) {
-        Log.d(name, "MY_LOG: onHandleIntent")
+        Timber.d("MY_LOG: onHandleIntent")
 
         period = intent?.getLongExtra(EXTRA_PERIOD, period) ?: period
         count = intent?.getIntExtra(EXTRA_COUNT, count) ?: count
@@ -42,17 +54,20 @@ abstract class TimeLapseService(private val name: String) : Service() {
         endTime = intent?.getLongExtra(EXTRA_END_TIME, startTime + (period * count))
             ?: startTime + (period * count)
 
-        handler.post(takePicture())
+        if (startTime < System.currentTimeMillis()) {
+            handler.post(this)
+        } else {
+            handler.postDelayed(this, startTime - System.currentTimeMillis())
+        }
+
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d(name, "MY_LOG: onStartCommand")
-
-        onHandleIntent(intent)
+        Timber.d("MY_LOG: onStartCommand")
 
         when (intent?.action) {
             Constants.ACTION.START_FOREGROUND_ACTION -> {
-                Log.d(name, "MY_LOG: Start action")
+                Timber.d("MY_LOG: Start action")
                 val icon: Bitmap = BitmapFactory.decodeResource(
                     resources,
                     R.drawable.ic_menu_camera
@@ -70,9 +85,11 @@ abstract class TimeLapseService(private val name: String) : Service() {
                     .setOngoing(true).build()
 
                 startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, notification)
+
+                onHandleIntent(intent)
             }
             Constants.ACTION.STOP_FOREGROUND_ACTION -> {
-                Log.d(name, "MY_LOG: Stop action")
+                Timber.d("MY_LOG: Stop action")
                 stopForeground(true)
                 ServiceManager.stop(this::class.java)
             }
@@ -82,21 +99,8 @@ abstract class TimeLapseService(private val name: String) : Service() {
     }
 
     open fun takeShotIntent() = ShotActivity.getIntent(applicationContext).apply {
-        Log.d(name, "MY_LOG: takeShotIntent")
+        Timber.d("MY_LOG: takeShotIntent")
         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_USER_ACTION
-    }
-
-    private fun takePicture(): Runnable = Runnable {
-        Log.d(name, "MY_LOG: takePicture")
-        if (System.currentTimeMillis() < endTime) {
-            handler.removeCallbacks(takePicture())
-            Log.d(name, "MY_LOG: opening ShotActivity")
-            startActivity(takeShotIntent())
-            handler.postDelayed(takePicture(), period)
-        } else {
-            Log.d(name, "MY_LOG: stop")
-            ServiceManager.stop(this::class.java)
-        }
     }
 
     companion object {

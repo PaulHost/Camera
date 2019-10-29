@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import paul.host.camera.R
-import paul.host.camera.util.WakeUpManager
+import paul.host.camera.common.util.WakeUpManager
 
 class ShotActivity : AppCompatActivity() {
 
@@ -39,7 +39,7 @@ class ShotActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_LONG_EXPOSURE_SHOT = "EXTRA_LONG_EXPOSURE_SHOT"
-        private const val EXTRA_PICTURE_NAME = "EXTRA_PICTURE_NAME"
+        const val EXTRA_PICTURE_NAME = "EXTRA_PICTURE_NAME"
 
         fun getIntent(context: Context, name: String? = null) = Intent(
             context,
