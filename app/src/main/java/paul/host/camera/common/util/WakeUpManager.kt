@@ -1,4 +1,4 @@
-package paul.host.camera.util
+package paul.host.camera.common.util
 
 import android.annotation.SuppressLint
 import android.app.KeyguardManager

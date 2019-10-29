@@ -1,12 +1,13 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package paul.host.camera.ui
 
-import  android.Manifest
+import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Matrix
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.util.Size
 import android.view.*
 import androidx.camera.core.*
@@ -15,6 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import paul.host.camera.R
+import timber.log.Timber
 import java.io.File
 import java.util.concurrent.Executors
 
@@ -45,7 +47,7 @@ open class ShotFragment : Fragment(), LifecycleOwner, ImageCapture.OnImageSavedL
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? = inflater.inflate(R.layout.shot_fragment, container, false).apply {
-        Log.d(this::class.java.simpleName, "MY_LOG: onCreateView")
+        Timber.d("MY_LOG: onCreateView")
 
         viewFinder = findViewById(R.id.texture_view_finder)
 
@@ -64,12 +66,12 @@ open class ShotFragment : Fragment(), LifecycleOwner, ImageCapture.OnImageSavedL
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.d(this::class.java.simpleName, "MY_LOG: onViewCreated")
+        Timber.d("MY_LOG: onViewCreated")
         _handler.postDelayed(cameraReadyDaley(), 1000)
     }
 
     override fun onImageSaved(file: File) {
-        Log.d(this::class.java.simpleName, "MY_LOG: Photo capture succeeded: ${file.absolutePath}")
+        Timber.d("MY_LOG: Photo capture succeeded: ${file.absolutePath}")
         viewFinder.post {
             activity?.finish()
         }
@@ -80,7 +82,7 @@ open class ShotFragment : Fragment(), LifecycleOwner, ImageCapture.OnImageSavedL
         message: String,
         exc: Throwable?
     ) {
-        Log.e(this::class.java.simpleName, "MY_LOG: Photo capture failed: $message")
+        Timber.e("MY_LOG: Photo capture failed: $message")
         viewFinder.post {
             activity?.finish()
         }
@@ -145,7 +147,17 @@ open class ShotFragment : Fragment(), LifecycleOwner, ImageCapture.OnImageSavedL
         preview
     }
 
-    private fun previewTargetResolution() = Size(viewFinder.width / 2, viewFinder.height / 2)
+    private fun previewTargetResolution(): Size {
+        val h = 1280
+        val w = 960
+        return when (viewFinder.display.rotation) {
+            Surface.ROTATION_0,
+            Surface.ROTATION_270 -> Size(w, h)
+            Surface.ROTATION_90,
+            Surface.ROTATION_180 -> Size(h, w)
+            else -> Size(viewFinder.width, viewFinder.height)
+        }
+    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>, grantResults: IntArray
@@ -154,7 +166,7 @@ open class ShotFragment : Fragment(), LifecycleOwner, ImageCapture.OnImageSavedL
             if (allPermissionsGranted()) {
                 viewFinder.post { startCamera() }
             } else {
-                Log.d(this::class.java.simpleName, "MY_LOG: onRequestPermissionsResult denied")
+                Timber.d("MY_LOG: onRequestPermissionsResult denied")
                 activity?.finish()
             }
         }

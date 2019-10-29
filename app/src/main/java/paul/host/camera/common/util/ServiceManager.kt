@@ -1,11 +1,12 @@
 @file:Suppress("unused")
 
-package paul.host.camera.util
+package paul.host.camera.common.util
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
-import paul.host.camera.data.Constants
+import android.os.Build
+import paul.host.camera.common.Constants
+import timber.log.Timber
 
 object ServiceManager {
     private val SERVICES: MutableMap<String, ServiceWrapper> = mutableMapOf()
@@ -52,16 +53,20 @@ object ServiceManager {
         }
 
         fun start() {
-            Log.d(service.simpleName, "MY_LOG: start")
+            Timber.d("MY_LOG: start")
             if (!isServiceBound) {
                 intent.action = Constants.ACTION.START_FOREGROUND_ACTION
-                context.startService(intent)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    context.startForegroundService(intent)
+                } else {
+                    context.startService(intent)
+                }
                 isServiceBound = true
             }
         }
 
         fun stop() {
-            Log.d(service.simpleName, "MY_LOG: stop")
+            Timber.d("MY_LOG: stop")
             if (isServiceBound) {
                 intent.action = Constants.ACTION.STOP_FOREGROUND_ACTION
                 context.stopService(intent)

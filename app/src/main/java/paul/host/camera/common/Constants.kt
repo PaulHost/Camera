@@ -1,4 +1,4 @@
-package paul.host.camera.data
+package paul.host.camera.common
 
 
 object Constants {
