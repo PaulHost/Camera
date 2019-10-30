@@ -16,6 +16,7 @@ import io.fotoapparat.selector.back
 import io.fotoapparat.view.CameraView
 import io.fotoapparat.view.FocusView
 import paul.host.camera.R
+import paul.host.camera.common.Constants
 import timber.log.Timber
 import java.io.File
 
@@ -89,7 +90,7 @@ open class ShotFragment : Fragment(), Runnable {
 
     fun takePicture() = takePicture(
         File(
-            activity?.externalMediaDirs?.first(),
+            Constants.FOLDERS.mediaDirFile(requireContext()),
             "${arguments?.get(ARG_PICTURE_NAME) ?: System.currentTimeMillis()}.jpg"
         )
     )
