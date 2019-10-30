@@ -36,15 +36,23 @@ object VideoMaker {
         iName: String,
         fps: Int = 25,
         vName: String
-    ): Array<String> = RxFFmpegCommandList().let {
-        it.append("-r").append("1/5")
-        it.append("-i").append("$iName%3d")
-        it.append("-c:v").append("libx264")
-        it.append("-vf").append("fps=$fps")
-        it.append("-pix_fmt").append("yuv420p")
-        it.append("$vName.mp4")
-        it.build()
-    }
+    ): Array<String> =
+        "ffmpeg -r 1/5 -i $iName%3d.jpg -c:v libx264 -vf fps=$fps -pix_fmt yuv420p $vName.mp4"
+            .toFfmpgCommand()
+
+//    fun command(
+//        iName: String,
+//        fps: Int = 25,
+//        vName: String
+//    ): Array<String> = RxFFmpegCommandList().let {
+//        it.append("-r").append("1/5")
+//        it.append("-i").append("$iName%3d.jpg")
+//        it.append("-c:v").append("libx264")
+//        it.append("-vf").append("fps=$fps")
+//        it.append("-pix_fmt").append("yuv420p")
+//        it.append("$vName.mp4")
+//        it.build()
+//    }
 
     fun String.toFfmpgCommand(): Array<String> =
         this.split(" ".toRegex()).dropLastWhile { this.isEmpty() }.toTypedArray()

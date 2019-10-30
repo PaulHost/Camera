@@ -12,7 +12,7 @@ class LongExposureService : TimeLapseService(LongExposureService::class.java.sim
         putExtra(ShotActivity.EXTRA_LONG_EXPOSURE_SHOT, true)
         putExtra(
             ShotActivity.EXTRA_PICTURE_NAME,
-            "${Constants.NAMES.IMAGE}${count.toImageName()}"
+            "${Constants.NAMES.TIME_LAPSE}${count.toImageName()}"
         )
         count++
     }

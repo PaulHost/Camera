@@ -7,8 +7,11 @@ import java.io.File
 
 object Constants {
 
+    const val CANCELED = "Canceled"
+    const val SUCCESSFUL = "Successful"
+
     object NAMES {
-        const val IMAGE = "time_lapse_"
+        const val TIME_LAPSE = "time_lapse_"
     }
 
     object ACTION {
@@ -17,7 +20,8 @@ object Constants {
     }
 
     object NOTIFICATION_ID {
-        const val FOREGROUND_SERVICE = 101
+        const val TIMELAPSE_SERVICE = 101
+        const val VIDEO_MAIKER_SERVICE = 102
     }
 
     object FOLDERS {
