@@ -12,6 +12,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import io.fotoapparat.Fotoapparat
+import io.fotoapparat.result.WhenDoneListener
 import io.fotoapparat.selector.back
 import io.fotoapparat.view.CameraView
 import io.fotoapparat.view.FocusView
@@ -82,7 +83,7 @@ open class ShotFragment : Fragment(), Runnable {
     }
 
     fun onImageSaved(file: File) {
-        Timber.d("MY_LOG: photographed: ${file.absolutePath}")
+        Timber.d("MY_LOG: saved: ${file.absolutePath}")
         focusView.post {
             activity?.finish()
         }
@@ -96,8 +97,11 @@ open class ShotFragment : Fragment(), Runnable {
     )
 
     fun takePicture(file: File) = fotoapparat.takePicture().apply {
-        saveToFile(file)
-        onImageSaved(file)
+        saveToFile(file).whenDone(object : WhenDoneListener<Unit> {
+            override fun whenDone(it: Unit?) {
+                onImageSaved(file)
+            }
+        })
     }
 
     override fun onRequestPermissionsResult(

@@ -9,6 +9,7 @@ object Constants {
 
     const val CANCELED = "Canceled"
     const val SUCCESSFUL = "Successful"
+    const val CHANNEL_ID = "1488"
 
     object NAMES {
         const val TIME_LAPSE = "time_lapse_"
@@ -21,7 +22,7 @@ object Constants {
 
     object NOTIFICATION_ID {
         const val TIMELAPSE_SERVICE = 101
-        const val VIDEO_MAIKER_SERVICE = 102
+        const val VIDEO_MAKER_SERVICE = 102
     }
 
     object FOLDERS {

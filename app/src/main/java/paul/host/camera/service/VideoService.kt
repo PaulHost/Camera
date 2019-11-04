@@ -41,6 +41,7 @@ class VideoService : Service() {
                     .setTicker(name)
                     .setContentText(name)
                     .setSmallIcon(R.drawable.ic_menu_camera)
+                    .setChannelId(Constants.CHANNEL_ID)
                     .setLargeIcon(
                         Bitmap.createScaledBitmap(
                             icon, 128, 128, false
@@ -59,7 +60,7 @@ class VideoService : Service() {
                     .observeOn(Schedulers.io())
                     .subscribe(subscriber())
 
-                startForeground(Constants.NOTIFICATION_ID.VIDEO_MAIKER_SERVICE, notification)
+                startForeground(Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE, notification)
             }
             Constants.ACTION.STOP_FOREGROUND_ACTION -> {
                 Timber.d("MY_LOG: Stop action")
@@ -80,15 +81,15 @@ class VideoService : Service() {
             notificationBuilder.setContentText(Constants.SUCCESSFUL)
                 .setProgress(0, 0, false)
             notificationManager.notify(
-                Constants.NOTIFICATION_ID.VIDEO_MAIKER_SERVICE,
+                Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE,
                 notificationBuilder.build()
             )
         }
 
-        override fun onProgress(progress: Int, progressTime: Long) {
-            notificationBuilder.setProgress(STATE_PROGRESS, progress, false)
+        override fun onProgress(progress: Int) {
+            notificationBuilder.setProgress(100, progress, false)
             notificationManager.notify(
-                Constants.NOTIFICATION_ID.VIDEO_MAIKER_SERVICE,
+                Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE,
                 notificationBuilder.build()
             )
         }
@@ -98,7 +99,7 @@ class VideoService : Service() {
             notificationBuilder.setContentText(Constants.CANCELED)
                 .setProgress(0, 0, false)
             notificationManager.notify(
-                Constants.NOTIFICATION_ID.VIDEO_MAIKER_SERVICE,
+                Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE,
                 notificationBuilder.build()
             )
         }
@@ -108,7 +109,7 @@ class VideoService : Service() {
             notificationBuilder.setContentText("Error: $message")
                 .setProgress(0, 0, false)
             notificationManager.notify(
-                Constants.NOTIFICATION_ID.VIDEO_MAIKER_SERVICE,
+                Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE,
                 notificationBuilder.build()
             )
         }

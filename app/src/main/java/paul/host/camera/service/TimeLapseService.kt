@@ -82,6 +82,7 @@ open class TimeLapseService(private val name: String) : Service(), Runnable {
                             icon, 128, 128, false
                         )
                     )
+                    .setChannelId(Constants.CHANNEL_ID)
                     .setOngoing(true).build()
 
                 startForeground(Constants.NOTIFICATION_ID.TIMELAPSE_SERVICE, notification)
