@@ -22,10 +22,10 @@ class App : Application() {
             Timber.plant(Timber.DebugTree())
         }
 
-        createNotivicationChannal()
+        createNitrificationChannel()
     }
 
-    private fun createNotivicationChannal() {
+    private fun createNitrificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = getString(R.string.app_name)
             val descriptionText = getString(R.string.channel_description)

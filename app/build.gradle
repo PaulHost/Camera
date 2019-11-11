@@ -52,7 +52,4 @@ dependencies {
     //Timber
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'joda-time:joda-time:2.9.9'
-
-    //RxFFmpeg
-    implementation 'com.github.microshow:RxFFmpeg:2.1.0'
 }

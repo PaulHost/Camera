@@ -7,12 +7,10 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import io.microshow.rxffmpeg.RxFFmpegSubscriber
-import io.reactivex.schedulers.Schedulers
 import paul.host.camera.common.Constants
-import paul.host.camera.common.VideoMaker
 import paul.host.camera.common.util.ServiceManager
 import timber.log.Timber
 
@@ -20,6 +18,7 @@ import timber.log.Timber
 class VideoService : Service() {
     val name = this::class.java.simpleName
     val notificationBuilder = NotificationCompat.Builder(this, name)
+    val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
     override fun onBind(intent: Intent?): IBinder? {
         Timber.d("MY_LOG: onBind")
@@ -48,17 +47,7 @@ class VideoService : Service() {
                         )
                     )
                     .setOngoing(true).build()
-
-                VideoMaker.make(
-                    VideoMaker.command(
-                        iName = intent.getStringExtra(EXTRA_IMAGE_NAME),
-                        fps = intent.getIntExtra(EXTRA_FPS, 25),
-                        vName = intent.getStringExtra(EXTRA_VIDEO_NAME)
-                    )
-                )
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(Schedulers.io())
-                    .subscribe(subscriber())
+                TODO("Implementing of video creation")
 
                 startForeground(Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE, notification)
             }
@@ -72,47 +61,42 @@ class VideoService : Service() {
         return START_STICKY
     }
 
-    private fun subscriber() = object : RxFFmpegSubscriber() {
-        val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    fun onFinish() {
+        Timber.d(Constants.SUCCESSFUL)
+        notificationBuilder.setContentText(Constants.SUCCESSFUL)
+            .setProgress(0, 0, false)
+        notificationManager.notify(
+            Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE,
+            notificationBuilder.build()
+        )
+    }
 
-        override fun onFinish() {
-            Timber.d(Constants.SUCCESSFUL)
-            notificationBuilder.setContentText(Constants.SUCCESSFUL)
-                .setProgress(0, 0, false)
-            notificationManager.notify(
-                Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE,
-                notificationBuilder.build()
-            )
-        }
+    fun onProgress(progress: Int) {
+        notificationBuilder.setProgress(100, progress, false)
+        notificationManager.notify(
+            Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE,
+            notificationBuilder.build()
+        )
+    }
 
-        override fun onProgress(progress: Int) {
-            notificationBuilder.setProgress(100, progress, false)
-            notificationManager.notify(
-                Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE,
-                notificationBuilder.build()
-            )
-        }
+    fun onCancel() {
+        Timber.d("onCancel")
+        notificationBuilder.setContentText(Constants.CANCELED)
+            .setProgress(0, 0, false)
+        notificationManager.notify(
+            Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE,
+            notificationBuilder.build()
+        )
+    }
 
-        override fun onCancel() {
-            Timber.d("onCancel")
-            notificationBuilder.setContentText(Constants.CANCELED)
-                .setProgress(0, 0, false)
-            notificationManager.notify(
-                Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE,
-                notificationBuilder.build()
-            )
-        }
-
-        override fun onError(message: String) {
-            Timber.d("onError：$message")
-            notificationBuilder.setContentText("Error: $message")
-                .setProgress(0, 0, false)
-            notificationManager.notify(
-                Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE,
-                notificationBuilder.build()
-            )
-        }
+    fun onError(message: String) {
+        Timber.d("onError：$message")
+        notificationBuilder.setContentText("Error: $message")
+            .setProgress(0, 0, false)
+        notificationManager.notify(
+            Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE,
+            notificationBuilder.build()
+        )
     }
 
     companion object {
@@ -132,6 +116,20 @@ class VideoService : Service() {
             putExtra(EXTRA_FPS, fps)
             putExtra(EXTRA_VIDEO_NAME, vName)
             action = Constants.ACTION.START_FOREGROUND_ACTION
+        }
+
+        fun startDefault(context: Context) {
+            val intent = getIntent(
+                context = context,
+                fps = 25,
+                iName = "${Constants.FOLDERS.mediaDirFile(context)}/$${Constants.NAMES.TIME_LAPSE}",
+                vName = "${Constants.FOLDERS.externalStorageDirFile()}/${Constants.NAMES.TIME_LAPSE}"
+            )
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(intent)
+            } else {
+                context.startService(intent)
+            }
         }
     }
 
