@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Camera</string>
+    <string name="channel_description">Background status notifications</string>
 </resources>

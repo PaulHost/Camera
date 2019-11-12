@@ -1,13 +1,13 @@
+@file:Suppress("DEPRECATION", "WakelockTimeout")
+
 package paul.host.camera.common.util
 
-import android.annotation.SuppressLint
 import android.app.KeyguardManager
 import android.content.Context
 import android.content.Context.POWER_SERVICE
 import android.os.PowerManager
 
 
-@SuppressLint("WakelockTimeout")
 object WakeUpManager {
     fun wakeUp(context: Context) {
         val powerManager = context.getSystemService(POWER_SERVICE) as PowerManager

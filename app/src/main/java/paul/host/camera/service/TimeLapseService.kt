@@ -2,6 +2,7 @@ package paul.host.camera.service
 
 import android.R
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -15,12 +16,12 @@ import paul.host.camera.ui.ShotActivity
 import timber.log.Timber
 
 
-abstract class TimeLapseService(private val name: String) : Service(), Runnable {
+open class TimeLapseService(private val name: String) : Service(), Runnable {
     private var handler: Handler = Handler(Looper.getMainLooper())
     private var startTime = System.currentTimeMillis()
     private var count = 50
     private var endTime = 0L
-    private var period: Long = 24000
+    private var interval: Long = 24000
         set(minutes) {
             minutes * (60000)
             field = minutes
@@ -37,29 +38,28 @@ abstract class TimeLapseService(private val name: String) : Service(), Runnable 
             handler.removeCallbacks(this)
             Timber.d("MY_LOG: opening ShotActivity")
             startActivity(takeShotIntent())
-            handler.postDelayed(this, period)
+            handler.postDelayed(this, interval)
         } else {
             Timber.d("MY_LOG: stop")
-            ServiceManager.stop(this::class.java)
+            application.stopService(getIntent(applicationContext))
         }
     }
 
     open fun onHandleIntent(intent: Intent?) {
         Timber.d("MY_LOG: onHandleIntent")
 
-        period = intent?.getLongExtra(EXTRA_PERIOD, period) ?: period
+        interval = intent?.getLongExtra(EXTRA_INTERVAL, interval) ?: interval
         count = intent?.getIntExtra(EXTRA_COUNT, count) ?: count
         startTime = intent?.getLongExtra(EXTRA_START_TIME, System.currentTimeMillis())
             ?: System.currentTimeMillis()
-        endTime = intent?.getLongExtra(EXTRA_END_TIME, startTime + (period * count))
-            ?: startTime + (period * count)
+        endTime = intent?.getLongExtra(EXTRA_END_TIME, startTime + (interval * count))
+            ?: startTime + (interval * count)
 
         if (startTime < System.currentTimeMillis()) {
             handler.post(this)
         } else {
             handler.postDelayed(this, startTime - System.currentTimeMillis())
         }
-
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -82,9 +82,10 @@ abstract class TimeLapseService(private val name: String) : Service(), Runnable 
                             icon, 128, 128, false
                         )
                     )
+                    .setChannelId(Constants.CHANNEL_ID)
                     .setOngoing(true).build()
 
-                startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, notification)
+                startForeground(Constants.NOTIFICATION_ID.TIMELAPSE_SERVICE, notification)
 
                 onHandleIntent(intent)
             }
@@ -104,9 +105,32 @@ abstract class TimeLapseService(private val name: String) : Service(), Runnable 
     }
 
     companion object {
-        const val EXTRA_PERIOD = "EXTRA_PERIOD"
+        const val EXTRA_INTERVAL = "EXTRA_INTERVAL"
         const val EXTRA_COUNT = "EXTRA_COUNT"
-        const val EXTRA_START_TIME = "EXTRA_COUNT"
-        const val EXTRA_END_TIME = "EXTRA_COUNT"
+        const val EXTRA_START_TIME = "EXTRA_START_TIME"
+        const val EXTRA_END_TIME = "EXTRA_END_TIME"
+
+        fun getIntent(
+            context: Context,
+            action: String = Constants.ACTION.STOP_FOREGROUND_ACTION
+        ) = Intent(context, VideoService::class.java).apply {
+            this.action = action
+        }
+
+        fun getIntent(
+            context: Context,
+            interval: Int = 24,
+            count: Int? = null,
+            startTime: Long = System.currentTimeMillis(),
+            endTime: Long? = null
+        ) = getIntent(
+            context,
+            Constants.ACTION.START_FOREGROUND_ACTION
+        ).apply {
+            putExtra(EXTRA_INTERVAL, interval)
+            putExtra(EXTRA_COUNT, count)
+            putExtra(EXTRA_START_TIME, startTime)
+            putExtra(EXTRA_END_TIME, endTime)
+        }
     }
 }
