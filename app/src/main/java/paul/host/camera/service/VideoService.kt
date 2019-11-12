@@ -47,6 +47,7 @@ class VideoService : Service() {
                         )
                     )
                     .setOngoing(true).build()
+
                 TODO("Implementing of video creation")
 
                 startForeground(Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE, notification)
