@@ -17,9 +17,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         val button = findViewById<Button>(R.id.main_button)
         if (started) {
-            button.text = "Stop"
+            button.text = getString(R.string.stop)
         } else {
-            button.text = "Start"
+            button.text = getString(R.string.start)
         }
     }
 
@@ -28,10 +28,10 @@ class MainActivity : AppCompatActivity() {
         Timber.d("MY_LOG: ${if (started) "stop" else "start"} button click")
         if (!started) {
             ServiceManager.start(applicationContext, LongExposureService::class.java)
-            v.text = "Stop"
+            v.text = getString(R.string.stop)
         } else {
             ServiceManager.stop(LongExposureService::class.java)
-            v.text = "Start"
+            v.text = getString(R.string.start)
         }
         started = !started
     }

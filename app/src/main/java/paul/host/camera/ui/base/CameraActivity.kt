@@ -1,4 +1,4 @@
-package paul.host.camera.ui
+package paul.host.camera.ui.base
 
 import android.content.Context
 import android.content.Intent
@@ -8,8 +8,9 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import paul.host.camera.R
 import paul.host.camera.common.util.WakeUpManager
+import paul.host.camera.ui.ShotFragment
 
-class ShotActivity : AppCompatActivity() {
+class CameraActivity : AppCompatActivity() {
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -43,7 +44,7 @@ class ShotActivity : AppCompatActivity() {
 
         fun getIntent(context: Context, name: String? = null) = Intent(
             context,
-            ShotActivity::class.java
+            CameraActivity::class.java
         ).apply {
             putExtra(EXTRA_PICTURE_NAME, name)
         }

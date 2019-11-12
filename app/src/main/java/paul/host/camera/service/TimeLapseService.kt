@@ -12,7 +12,7 @@ import android.os.Looper
 import androidx.core.app.NotificationCompat
 import paul.host.camera.common.Constants
 import paul.host.camera.common.util.ServiceManager
-import paul.host.camera.ui.ShotActivity
+import paul.host.camera.ui.base.CameraActivity
 import timber.log.Timber
 
 
@@ -36,7 +36,7 @@ open class TimeLapseService(private val name: String) : Service(), Runnable {
         Timber.d("MY_LOG: takePicture")
         if (System.currentTimeMillis() < endTime) {
             handler.removeCallbacks(this)
-            Timber.d("MY_LOG: opening ShotActivity")
+            Timber.d("MY_LOG: opening CameraActivity")
             startActivity(takeShotIntent())
             handler.postDelayed(this, interval)
         } else {
@@ -99,7 +99,7 @@ open class TimeLapseService(private val name: String) : Service(), Runnable {
         return START_STICKY
     }
 
-    open fun takeShotIntent() = ShotActivity.getIntent(applicationContext).apply {
+    open fun takeShotIntent() = CameraActivity.getIntent(applicationContext).apply {
         Timber.d("MY_LOG: takeShotIntent")
         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_USER_ACTION
     }

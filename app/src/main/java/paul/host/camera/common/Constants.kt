@@ -16,8 +16,8 @@ object Constants {
     }
 
     object ACTION {
-        val START_FOREGROUND_ACTION = "${this::class.java.canonicalName}.startforeground"
-        val STOP_FOREGROUND_ACTION = "${this::class.java.canonicalName}.stopforeground"
+        val START_FOREGROUND_ACTION = "${this::class.java.`package`}.startforeground"
+        val STOP_FOREGROUND_ACTION = "${this::class.java.`package`}.stopforeground"
     }
 
     object NOTIFICATION_ID {
