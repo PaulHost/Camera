@@ -7,20 +7,19 @@ import java.io.File
 
 open class ShotFragment : CameraFragment(), Runnable {
 
+    override fun onStart() {
+        super.onStart()
+        focusView.postDelayed(this, PHOTO_DELAY)
+    }
+
     override fun run() {
         Timber.d("MY_LOG: run taking picture")
         focusView.removeCallbacks(this)
         if (fotoapparat.isAvailable(activeCamera.lensPosition)) {
-            takePicture()
+            takePicture(arguments?.getString(ARG_PICTURE_NAME))
         } else {
             focusView.postDelayed(this, PHOTO_DELAY)
         }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        Timber.d("MY_LOG: onStop")
-        fotoapparat.stop()
     }
 
     override fun onImageSaved(file: File) {
