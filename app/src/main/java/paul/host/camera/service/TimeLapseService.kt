@@ -1,6 +1,5 @@
 package paul.host.camera.service
 
-import android.R
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -12,7 +11,7 @@ import android.os.Looper
 import androidx.core.app.NotificationCompat
 import paul.host.camera.common.Constants
 import paul.host.camera.common.util.ServiceManager
-import paul.host.camera.ui.base.CameraActivity
+import paul.host.camera.ui.MainActivity
 import timber.log.Timber
 
 
@@ -37,7 +36,7 @@ open class TimeLapseService(private val name: String) : Service(), Runnable {
         if (System.currentTimeMillis() < endTime) {
             handler.removeCallbacks(this)
             Timber.d("MY_LOG: opening CameraActivity")
-            startActivity(takeShotIntent())
+            (takeShotIntent())
             handler.postDelayed(this, interval)
         } else {
             Timber.d("MY_LOG: stop")
@@ -70,13 +69,13 @@ open class TimeLapseService(private val name: String) : Service(), Runnable {
                 Timber.d("MY_LOG: Start action")
                 val icon: Bitmap = BitmapFactory.decodeResource(
                     resources,
-                    R.drawable.ic_menu_camera
+                    android.R.drawable.ic_menu_camera
                 )
                 val notification = NotificationCompat.Builder(this, name)
                     .setContentTitle(name)
                     .setTicker("Camera Sticker")
                     .setContentText(name)
-                    .setSmallIcon(R.drawable.ic_menu_camera)
+                    .setSmallIcon(android.R.drawable.ic_menu_camera)
                     .setLargeIcon(
                         Bitmap.createScaledBitmap(
                             icon, 128, 128, false
@@ -99,7 +98,7 @@ open class TimeLapseService(private val name: String) : Service(), Runnable {
         return START_STICKY
     }
 
-    open fun takeShotIntent() = CameraActivity.getIntent(applicationContext).apply {
+    open fun takeShotIntent() = MainActivity.getIntent(applicationContext).apply {
         Timber.d("MY_LOG: takeShotIntent")
         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_USER_ACTION
     }
