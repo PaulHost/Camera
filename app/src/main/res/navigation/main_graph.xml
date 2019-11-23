@@ -41,7 +41,7 @@
         tools:layout="@layout/camera_fragment">
         <deepLink
             android:id="@+id/deepLink"
-            app:uri="https://paul.host.camera/fast_shot"
+            app:uri="camera://timelapse/fast_shot"
             android:autoVerify="true" />
         <action
             android:id="@+id/action_fastShotFragment_to_projectFragment"

@@ -21,6 +21,7 @@ import io.fotoapparat.view.FocusView
 import kotlinx.android.synthetic.main.camera_fragment.view.*
 import paul.host.camera.R
 import paul.host.camera.common.Constants
+import paul.host.camera.service.TimeLapseService
 import paul.host.camera.ui.MainListener
 import timber.log.Timber
 import java.io.File
@@ -59,6 +60,10 @@ open class CameraFragment : Fragment() {
             view = camera_view,
             focusView = focus_view
         )
+
+        start_button.setOnClickListener {
+            TimeLapseService.start(requireContext().applicationContext)
+        }
 
         // Request camera permissions
         if (allPermissionsGranted()) focusView.post {

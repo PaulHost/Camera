@@ -16,9 +16,10 @@ import timber.log.Timber
 
 
 class VideoService : Service() {
-    val name = this::class.java.simpleName
-    val notificationBuilder = NotificationCompat.Builder(this, name)
-    val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    private val name = this::class.java.simpleName
+    private val notificationBuilder = NotificationCompat.Builder(this, name)
+    private val notificationManager =
+        getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
     override fun onBind(intent: Intent?): IBinder? {
         Timber.d("MY_LOG: onBind")

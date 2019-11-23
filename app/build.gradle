@@ -24,9 +24,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    // Configure only for each module that uses Java 8
+    // language features (either in its source code or
+    // through dependencies).
     compileOptions {
-        sourceCompatibility kotlin_version
-        targetCompatibility kotlin_version
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    // For Kotlin projects
+    kotlinOptions {
+        jvmTarget = "1.8"
     }
 }
 
@@ -66,10 +73,10 @@ dependencies {
     implementation "android.arch.paging:rxjava2:2.1.0-alpha01"
 
     //Room
-    implementation 'androidx.room:room-runtime:2.2.1'
-    implementation 'androidx.room:room-rxjava2:2.2.1'
+    implementation 'androidx.room:room-runtime:2.2.2'
+    implementation 'androidx.room:room-rxjava2:2.2.2'
     implementation "android.arch.persistence.room:rxjava2:1.1.1"
-    annotationProcessor 'androidx.room:room-compiler:2.2.1'
+    annotationProcessor 'androidx.room:room-compiler:2.2.2'
 
     //RxPreferences
     implementation 'com.f2prateek.rx.preferences2:rx-preferences:2.0.0'

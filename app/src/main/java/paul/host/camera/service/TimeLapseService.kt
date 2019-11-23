@@ -5,17 +5,20 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import androidx.core.app.NotificationCompat
 import paul.host.camera.common.Constants
 import paul.host.camera.common.util.ServiceManager
-import paul.host.camera.ui.MainActivity
+import paul.host.camera.common.util.toImageName
+import paul.host.camera.ui.fast_shot.FastShotFragment
 import timber.log.Timber
 
 
-open class TimeLapseService(private val name: String) : Service(), Runnable {
+open class TimeLapseService : Service(), Runnable {
+    private var iterator = 0
     private var handler: Handler = Handler(Looper.getMainLooper())
     private var startTime = System.currentTimeMillis()
     private var count = 50
@@ -35,8 +38,9 @@ open class TimeLapseService(private val name: String) : Service(), Runnable {
         Timber.d("MY_LOG: takePicture")
         if (System.currentTimeMillis() < endTime) {
             handler.removeCallbacks(this)
-            Timber.d("MY_LOG: opening CameraActivity")
-            (takeShotIntent())
+            Timber.d("MY_LOG: opening FastShotFragment")
+            takeShot()
+            iterator++
             handler.postDelayed(this, interval)
         } else {
             Timber.d("MY_LOG: stop")
@@ -71,10 +75,10 @@ open class TimeLapseService(private val name: String) : Service(), Runnable {
                     resources,
                     android.R.drawable.ic_menu_camera
                 )
-                val notification = NotificationCompat.Builder(this, name)
-                    .setContentTitle(name)
+                val notification = NotificationCompat.Builder(this, "test")
+                    .setContentTitle("test")
                     .setTicker("Camera Sticker")
-                    .setContentText(name)
+                    .setContentText("test")
                     .setSmallIcon(android.R.drawable.ic_menu_camera)
                     .setLargeIcon(
                         Bitmap.createScaledBitmap(
@@ -98,10 +102,13 @@ open class TimeLapseService(private val name: String) : Service(), Runnable {
         return START_STICKY
     }
 
-    open fun takeShotIntent() = MainActivity.getIntent(applicationContext).apply {
-        Timber.d("MY_LOG: takeShotIntent")
-        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_USER_ACTION
-    }
+    open fun takeShot() =
+        FastShotFragment.start(
+            applicationContext,
+            "test",
+            "test_${iterator.toImageName(count)}",
+            1
+        )
 
     companion object {
         const val EXTRA_INTERVAL = "EXTRA_INTERVAL"
@@ -112,7 +119,7 @@ open class TimeLapseService(private val name: String) : Service(), Runnable {
         fun getIntent(
             context: Context,
             action: String = Constants.ACTION.STOP_FOREGROUND_ACTION
-        ) = Intent(context, VideoService::class.java).apply {
+        ) = Intent(context, TimeLapseService::class.java).apply {
             this.action = action
         }
 
@@ -131,5 +138,17 @@ open class TimeLapseService(private val name: String) : Service(), Runnable {
             putExtra(EXTRA_START_TIME, startTime)
             putExtra(EXTRA_END_TIME, endTime)
         }
+
+        fun start(context: Context) =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(
+                    getIntent(
+                        context,
+                        Constants.ACTION.START_FOREGROUND_ACTION
+                    )
+                )
+            } else {
+                context.startService(getIntent(context, Constants.ACTION.START_FOREGROUND_ACTION))
+            }
     }
 }
