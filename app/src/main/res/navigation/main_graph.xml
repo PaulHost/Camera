@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_graph"
+    app:startDestination="@id/cameraFragment">
+
+    <fragment
+        android:id="@+id/cameraFragment"
+        android:name="paul.host.camera.ui.camera.CameraFragment"
+        android:label="CameraFragment">
+        <action
+            android:id="@+id/action_cameraFragment_to_projectsListFragment"
+            app:destination="@id/projectsListFragment" />
+        <action
+            android:id="@+id/action_cameraFragment_to_imageFragment"
+            app:destination="@id/imageFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/projectsListFragment"
+        android:name="paul.host.camera.ui.project_list.ProjectsListFragment"
+        android:label="projects_list_fragment"
+        tools:layout="@layout/projects_list_fragment">
+        <action
+            android:id="@+id/action_projectsListFragment_to_projectFragment"
+            app:destination="@id/projectFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/projectFragment"
+        android:name="paul.host.camera.ui.project.ProjectFragment"
+        android:label="album_fragment"
+        tools:layout="@layout/project_fragment">
+        <action
+            android:id="@+id/action_projectFragment_to_imageFragment"
+            app:destination="@id/imageFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/fastShotFragment"
+        android:name="paul.host.camera.ui.fast_shot.FastShotFragment"
+        android:label="fast_shot_fragment"
+        tools:layout="@layout/camera_fragment">
+        <deepLink
+            android:id="@+id/deepLink"
+            app:uri="camera://timelapse/fast_shot"
+            android:autoVerify="true" />
+        <action
+            android:id="@+id/action_fastShotFragment_to_projectFragment"
+            app:destination="@id/projectFragment"
+            app:popUpTo="@+id/projectsListFragment" />
+        <argument
+            android:name="ARG_PROJECT_ID"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="ARG_EXPOSURE_SEC"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </fragment>
+    <fragment
+        android:id="@+id/imageFragment"
+        android:name="paul.host.camera.ui.image.ImageFragment"
+        android:label="image_fragment"
+        tools:layout="@layout/image_fragment" />
+</navigation>

@@ -1,3 +1,5 @@
+@file:Suppress("ClassName")
+
 package paul.host.camera.common
 
 import android.content.Context
@@ -7,6 +9,7 @@ import java.io.File
 
 object Constants {
 
+    const val EMPTY_STRING = ""
     const val CANCELED = "Canceled"
     const val SUCCESSFUL = "Successful"
     const val CHANNEL_ID = "1488"
@@ -28,5 +31,9 @@ object Constants {
     object FOLDERS {
         fun mediaDirFile(context: Context): File = context.externalMediaDirs.first()
         fun externalStorageDirFile(): File = Environment.getExternalStorageDirectory()
+    }
+
+    object DEEP_LINK_URL {
+        const val FAST_SHOT_FRAGMENT = "camera://timelapse/fast_shot"
     }
 }

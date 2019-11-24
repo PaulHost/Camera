@@ -1,8 +1,9 @@
 @file:Suppress("MemberVisibilityCanBePrivate")
 
-package paul.host.camera.ui.base
+package paul.host.camera.ui.camera
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,10 +17,12 @@ import io.fotoapparat.configuration.CameraConfiguration
 import io.fotoapparat.result.WhenDoneListener
 import io.fotoapparat.selector.*
 import io.fotoapparat.view.CameraRenderer
-import io.fotoapparat.view.CameraView
 import io.fotoapparat.view.FocusView
+import kotlinx.android.synthetic.main.camera_fragment.view.*
 import paul.host.camera.R
 import paul.host.camera.common.Constants
+import paul.host.camera.service.TimeLapseService
+import paul.host.camera.ui.MainListener
 import timber.log.Timber
 import java.io.File
 
@@ -39,18 +42,28 @@ open class CameraFragment : Fragment() {
     internal lateinit var focusView: FocusView
     internal lateinit var fotoapparat: Fotoapparat
     internal var activeCamera: Camera = Camera.Back
+    internal var mainListener: MainListener? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is MainListener) mainListener = context
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.shot_fragment, container, false).apply {
+    ): View? = inflater.inflate(R.layout.camera_fragment, container, false).apply {
         Timber.d("MY_LOG: onCreateView")
 
         initFotoapparat(
-            view = findViewById<CameraView>(R.id.camera_view),
-            focusView = findViewById(R.id.focus_view)
+            view = camera_view,
+            focusView = focus_view
         )
+
+        start_button.setOnClickListener {
+            TimeLapseService.start(requireContext().applicationContext)
+        }
 
         // Request camera permissions
         if (allPermissionsGranted()) focusView.post {
