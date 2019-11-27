@@ -7,7 +7,7 @@ import androidx.room.Relation
 @Entity(tableName = "projects")
 data class ProjectEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: String,
+    val id: String? = null,
     val name: String,
     val removable: Boolean = false,
     val startTime: Long? = null,
