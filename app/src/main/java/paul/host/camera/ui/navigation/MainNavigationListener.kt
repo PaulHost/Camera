@@ -1,6 +1,7 @@
-package paul.host.camera.ui
+package paul.host.camera.ui.navigation
 
-interface MainListener {
+interface MainNavigationListener {
+    fun closeCurrentActivity()
     fun goToProjectsListScreen()
     fun goToProjectFromProjectsList(projectId: String, isEdit: Boolean)
     fun goToProjectFromFastShot(projectId: String)

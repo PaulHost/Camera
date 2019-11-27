@@ -8,10 +8,11 @@ import androidx.navigation.Navigation
 import paul.host.camera.R
 import paul.host.camera.ui.camera.CameraActivity
 import paul.host.camera.ui.image.ImageFragment
+import paul.host.camera.ui.navigation.MainNavigationListener
 import paul.host.camera.ui.project.ProjectFragment
 
 
-class MainActivity : CameraActivity(), MainListener {
+class MainNavigationActivity : CameraActivity(), MainNavigationListener {
     private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,6 +20,8 @@ class MainActivity : CameraActivity(), MainListener {
         setContentView(R.layout.activity_main)
         navController = Navigation.findNavController(this, R.id.nav_host_fragment)
     }
+
+    override fun closeCurrentActivity() = finish()
 
     override fun goToProjectsListScreen() = navController.navigate(
         R.id.action_cameraFragment_to_projectsListFragment
@@ -55,6 +58,6 @@ class MainActivity : CameraActivity(), MainListener {
     )
 
     companion object {
-        fun getIntent(context: Context) = Intent(context, MainActivity::class.java)
+        fun getIntent(context: Context) = Intent(context, MainNavigationActivity::class.java)
     }
 }

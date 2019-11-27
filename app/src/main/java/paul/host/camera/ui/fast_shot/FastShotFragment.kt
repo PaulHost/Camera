@@ -44,16 +44,7 @@ class FastShotFragment : CameraFragment(), Runnable {
 
     override fun onImageSaved(file: File) {
         super.onImageSaved(file)
-        focusView.post {
-            arguments?.apply {
-                mainListener?.goToProjectFromFastShot(
-                    getString(
-                        ARG_PROJECT_ID,
-                        Constants.EMPTY_STRING
-                    )
-                )
-            }
-        }
+        focusView.post { navigationListener?.closeCurrentActivity() }
     }
 
     companion object {

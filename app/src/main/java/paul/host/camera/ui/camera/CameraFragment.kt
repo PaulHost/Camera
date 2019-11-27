@@ -3,7 +3,6 @@
 package paul.host.camera.ui.camera
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import io.fotoapparat.Fotoapparat
 import io.fotoapparat.configuration.CameraConfiguration
 import io.fotoapparat.result.WhenDoneListener
@@ -22,7 +20,7 @@ import kotlinx.android.synthetic.main.camera_fragment.view.*
 import paul.host.camera.R
 import paul.host.camera.common.Constants
 import paul.host.camera.service.TimeLapseService
-import paul.host.camera.ui.MainListener
+import paul.host.camera.ui.navigation.NavigationFragment
 import timber.log.Timber
 import java.io.File
 
@@ -38,16 +36,10 @@ private val REQUIRED_PERMISSIONS = arrayOf(
     Manifest.permission.DISABLE_KEYGUARD
 )
 
-open class CameraFragment : Fragment() {
+open class CameraFragment : NavigationFragment() {
     internal lateinit var focusView: FocusView
     internal lateinit var fotoapparat: Fotoapparat
     internal var activeCamera: Camera = Camera.Back
-    internal var mainListener: MainListener? = null
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is MainListener) mainListener = context
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

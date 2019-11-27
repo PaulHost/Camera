@@ -84,4 +84,23 @@ dependencies {
     //Timber
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'joda-time:joda-time:2.9.9'
+
+    //RxJava
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.14'
+    implementation 'com.jakewharton.rx2:replaying-share:2.1.0'
+
+    //Paging
+    implementation 'androidx.paging:paging-runtime:2.1.0'
+    testImplementation 'androidx.paging:paging-common:2.1.0'
+    implementation "android.arch.paging:rxjava2:2.1.0-alpha01"
+
+    //Room
+    implementation 'androidx.room:room-runtime:2.2.2'
+    implementation 'androidx.room:room-rxjava2:2.2.2'
+    implementation "android.arch.persistence.room:rxjava2:1.1.1"
+    annotationProcessor 'androidx.room:room-compiler:2.2.2'
+
+    //RxPreferences
+    implementation 'com.f2prateek.rx.preferences2:rx-preferences:2.0.0'
 }
