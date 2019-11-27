@@ -12,6 +12,9 @@ interface ImageDao {
     @Query("SELECT * FROM images")
     fun images(): Flowable<List<ImageEntity>>
 
+    @Query("SELECT * FROM images  WHERE projectId = :projectId")
+    fun images(projectId: String): Flowable<List<ImageEntity>>
+
     @Query("SELECT * FROM images WHERE id = :id")
     fun image(id: String): Flowable<ImageEntity>
 
