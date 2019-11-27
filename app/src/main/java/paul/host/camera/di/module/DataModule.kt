@@ -19,4 +19,8 @@ class DataModule {
     @Provides
     fun provideProjectDao(db: DataBase) = db.projectDao()
 
+    @Singleton
+    @Provides
+    fun provideImageDao(db: DataBase) = db.imageDao()
+
 }
