@@ -1,4 +1,4 @@
-package paul.host.camera.data.db.Entyties
+package paul.host.camera.data.db.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

@@ -4,7 +4,7 @@ package paul.host.camera.data.db.dao
 
 import androidx.room.*
 import io.reactivex.Flowable
-import paul.host.camera.data.db.Entyties.ProjectEntity
+import paul.host.camera.data.db.entity.ProjectEntity
 
 @Dao
 interface ProjectDao {

@@ -5,7 +5,7 @@ package paul.host.camera.data.db.dao
 
 import androidx.room.*
 import io.reactivex.Flowable
-import paul.host.camera.data.db.Entyties.ImageEntity
+import paul.host.camera.data.db.entity.ImageEntity
 
 @Dao
 interface ImageDao {

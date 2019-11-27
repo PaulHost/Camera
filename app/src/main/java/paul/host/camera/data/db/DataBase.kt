@@ -2,8 +2,8 @@ package paul.host.camera.data.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import paul.host.camera.data.db.Entyties.ImageEntity
-import paul.host.camera.data.db.Entyties.ProjectEntity
+import paul.host.camera.data.db.entity.ImageEntity
+import paul.host.camera.data.db.entity.ProjectEntity
 import paul.host.camera.data.db.dao.ImageDao
 import paul.host.camera.data.db.dao.ProjectDao
 

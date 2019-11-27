@@ -1,4 +1,4 @@
-package paul.host.camera.data.db.Entyties
+package paul.host.camera.data.db.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -12,6 +12,7 @@ data class ProjectEntity(
     val removable: Boolean = false,
     val startTime: Long? = null,
     val interval: Long? = null,
+    val endTime: Long? = null,
     val exposureTime: Long? = null,
     @Relation(parentColumn = "id", entityColumn = "projectId", entity = ImageEntity::class)
     val images: List<ImageEntity>
