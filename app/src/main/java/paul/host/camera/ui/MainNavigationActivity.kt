@@ -27,7 +27,7 @@ class MainNavigationActivity : CameraActivity(), MainNavigationListener {
         R.id.action_cameraFragment_to_projectsListFragment
     )
 
-    override fun goToProjectFromProjectsList(projectId: String, isEdit: Boolean) =
+    override fun goToProjectFromProjectsList(projectId: String?, isEdit: Boolean) =
         navController.navigate(
             R.id.action_projectsListFragment_to_projectFragment,
             Bundle().apply {

@@ -19,7 +19,6 @@ import io.fotoapparat.view.FocusView
 import kotlinx.android.synthetic.main.camera_fragment.view.*
 import paul.host.camera.R
 import paul.host.camera.common.Constants
-import paul.host.camera.service.TimeLapseService
 import paul.host.camera.ui.navigation.NavigationFragment
 import timber.log.Timber
 import java.io.File
@@ -54,7 +53,7 @@ open class CameraFragment : NavigationFragment() {
         )
 
         start_button.setOnClickListener {
-            TimeLapseService.start(requireContext().applicationContext)
+            navigationListener?.goToProjectsListScreen()
         }
 
         // Request camera permissions

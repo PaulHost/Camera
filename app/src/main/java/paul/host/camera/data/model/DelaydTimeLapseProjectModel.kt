@@ -6,22 +6,24 @@ import paul.host.camera.data.db.entity.ImageEntity
 import paul.host.camera.data.db.entity.ProjectEntity
 import java.util.*
 
-class TimeLapseProjectModel(
+class DelaydTimeLapseProjectModel(
     id: String,
     name: String,
-    images: List<String> = listOf(),
-    var removable: Boolean = false,
+    images: List<String>,
+    var removable: Boolean,
+    var startTime: Long,
     var interval: Long,
-    var count: Int,
-    var exposureTime: Long = 0L
+    var endTime: Long,
+    var exposureTime: Long
 ) : ProjectModel(id, name, images) {
 
     constructor(projectEntity: ProjectEntity? = null) : this(
         id = projectEntity?.id ?: UUID.randomUUID().toString(),
         name = projectEntity?.name ?: Constants.EMPTY_STRING,
         removable = projectEntity?.removable ?: false,
+        startTime = projectEntity?.startTime ?: 0L,
         interval = projectEntity?.interval ?: 0L,
-        count = projectEntity?.count ?: 0,
+        endTime = projectEntity?.endTime ?: 0L,
         exposureTime = projectEntity?.exposureTime ?: 0L,
         images = projectEntity?.images?.map { it.path } ?: mutableListOf()
     )
@@ -30,8 +32,9 @@ class TimeLapseProjectModel(
         id = id,
         name = name,
         removable = removable,
+        startTime = startTime,
         interval = interval,
-        count = count,
+        endTime = endTime,
         exposureTime = exposureTime,
         images = images.toImageEntity()
     )

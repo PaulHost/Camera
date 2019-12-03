@@ -1,5 +1,6 @@
 package paul.host.camera.service
 
+import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -10,14 +11,22 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import androidx.core.app.NotificationCompat
+import paul.host.camera.App
 import paul.host.camera.common.Constants
 import paul.host.camera.common.util.ServiceManager
 import paul.host.camera.common.util.toImageName
+import paul.host.camera.data.model.DelaydTimeLapseProjectModel
+import paul.host.camera.data.model.TimeLapseProjectModel
+import paul.host.camera.data.repository.ProjectsRepository
 import paul.host.camera.ui.fast_shot.FastShotFragment
 import timber.log.Timber
+import javax.inject.Inject
 
 
 open class TimeLapseService : Service(), Runnable {
+    @Inject
+    lateinit var repository: ProjectsRepository
+
     private var iterator = 0
     private var handler: Handler = Handler(Looper.getMainLooper())
     private var startTime = System.currentTimeMillis()
@@ -31,6 +40,7 @@ open class TimeLapseService : Service(), Runnable {
 
     override fun onBind(intent: Intent?): IBinder? {
         Timber.d("MY_LOG: onBind")
+        App.component.inject(this)
         return null
     }
 
@@ -48,21 +58,23 @@ open class TimeLapseService : Service(), Runnable {
         }
     }
 
+    @SuppressLint("CheckResult")
     open fun onHandleIntent(intent: Intent?) {
         Timber.d("MY_LOG: onHandleIntent")
-
-        interval = intent?.getLongExtra(EXTRA_INTERVAL, interval) ?: interval
-        count = intent?.getIntExtra(EXTRA_COUNT, count) ?: count
-        startTime = intent?.getLongExtra(EXTRA_START_TIME, System.currentTimeMillis())
-            ?: System.currentTimeMillis()
-        endTime = intent?.getLongExtra(EXTRA_END_TIME, startTime + (interval * count))
-            ?: startTime + (interval * count)
-
-        if (startTime < System.currentTimeMillis()) {
-            handler.post(this)
-        } else {
-            handler.postDelayed(this, startTime - System.currentTimeMillis())
-        }
+        intent?.getStringExtra(EXTRA_PROJECT_ID)?.let(repository::getProject)?.subscribe({
+            if (it is TimeLapseProjectModel) {
+                interval = it.interval
+                startTime = System.currentTimeMillis()
+                endTime = interval * it.count + startTime
+            } else if (it is DelaydTimeLapseProjectModel) {
+                TODO()
+            }
+            if (startTime < System.currentTimeMillis()) {
+                handler.post(this)
+            } else {
+                handler.postDelayed(this, startTime - System.currentTimeMillis())
+            }
+        }, Timber::e)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -111,44 +123,25 @@ open class TimeLapseService : Service(), Runnable {
         )
 
     companion object {
-        const val EXTRA_INTERVAL = "EXTRA_INTERVAL"
-        const val EXTRA_COUNT = "EXTRA_COUNT"
-        const val EXTRA_START_TIME = "EXTRA_START_TIME"
-        const val EXTRA_END_TIME = "EXTRA_END_TIME"
+        const val EXTRA_PROJECT_ID = "EXTRA_PROJECT_ID"
 
         fun getIntent(
             context: Context,
-            action: String = Constants.ACTION.STOP_FOREGROUND_ACTION
+            action: String = Constants.ACTION.STOP_FOREGROUND_ACTION,
+            projectId: String? = null
         ) = Intent(context, TimeLapseService::class.java).apply {
             this.action = action
+            putExtra(EXTRA_PROJECT_ID, projectId)
         }
 
-        fun getIntent(
-            context: Context,
-            interval: Int = 24,
-            count: Int? = null,
-            startTime: Long = System.currentTimeMillis(),
-            endTime: Long? = null
-        ) = getIntent(
-            context,
-            Constants.ACTION.START_FOREGROUND_ACTION
-        ).apply {
-            putExtra(EXTRA_INTERVAL, interval)
-            putExtra(EXTRA_COUNT, count)
-            putExtra(EXTRA_START_TIME, startTime)
-            putExtra(EXTRA_END_TIME, endTime)
-        }
-
-        fun start(context: Context) =
+        fun start(context: Context, projectId: String? = null) {
+            val intent = getIntent(context, Constants.ACTION.START_FOREGROUND_ACTION, projectId)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(
-                    getIntent(
-                        context,
-                        Constants.ACTION.START_FOREGROUND_ACTION
-                    )
-                )
+                context.startForegroundService(intent)
             } else {
-                context.startService(getIntent(context, Constants.ACTION.START_FOREGROUND_ACTION))
+                context.startService(intent)
             }
+        }
+
     }
 }
