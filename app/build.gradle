@@ -64,7 +64,7 @@ dependencies {
 
     //RxJava
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-    implementation 'io.reactivex.rxjava2:rxjava:2.2.9'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.14'
     implementation 'com.jakewharton.rx2:replaying-share:2.1.0'
 
     //Paging
@@ -75,8 +75,7 @@ dependencies {
     //Room
     implementation 'androidx.room:room-runtime:2.2.2'
     implementation 'androidx.room:room-rxjava2:2.2.2'
-    implementation "android.arch.persistence.room:rxjava2:1.1.1"
-    annotationProcessor 'androidx.room:room-compiler:2.2.2'
+    kapt 'androidx.room:room-compiler:2.2.2'
 
     //RxPreferences
     implementation 'com.f2prateek.rx.preferences2:rx-preferences:2.0.0'
@@ -103,4 +102,8 @@ dependencies {
 
     //RxPreferences
     implementation 'com.f2prateek.rx.preferences2:rx-preferences:2.0.0'
+
+    //Glide
+    implementation 'com.github.bumptech.glide:glide:4.10.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.10.0'
 }

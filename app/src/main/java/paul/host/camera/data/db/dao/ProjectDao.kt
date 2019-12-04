@@ -3,6 +3,7 @@
 package paul.host.camera.data.db.dao
 
 import androidx.room.*
+import io.reactivex.Completable
 import io.reactivex.Flowable
 import paul.host.camera.data.db.entity.ProjectEntity
 
@@ -15,17 +16,17 @@ interface ProjectDao {
     fun project(id: String): Flowable<ProjectEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(project: ProjectEntity)
+    fun insert(project: ProjectEntity): Completable
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(projects: List<ProjectEntity>)
+    fun insert(projects: List<ProjectEntity>): Completable
 
     @Update
-    fun update(project: ProjectEntity)
+    fun update(project: ProjectEntity): Completable
 
     @Update
-    fun update(projects: List<ProjectEntity>)
+    fun update(projects: List<ProjectEntity>): Completable
 
     @Delete
-    fun delete(project: ProjectEntity)
+    fun delete(project: ProjectEntity): Completable
 }

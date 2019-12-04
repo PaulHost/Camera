@@ -9,7 +9,10 @@ import java.io.File
 
 object Constants {
 
+    const val ZERO = 0
+    const val ZERO_LONG = 0L
     const val EMPTY_STRING = ""
+    const val DATABASE_NAME = "projects"
     const val CANCELED = "Canceled"
     const val SUCCESSFUL = "Successful"
     const val CHANNEL_ID = "1488"
