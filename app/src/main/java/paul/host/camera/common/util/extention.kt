@@ -37,3 +37,7 @@ fun List<String>.toImageEntity(
     return entities
 }
 
+fun Long.millisToSeconds(): Int = (this / 1000).toInt()
+
+fun Int.secToMillis(): Long = this * 1000L
+

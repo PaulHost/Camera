@@ -6,6 +6,7 @@ import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import paul.host.camera.App
+import paul.host.camera.common.util.secToMillis
 import paul.host.camera.data.model.TimeLapseProjectModel
 import paul.host.camera.data.repository.ProjectsRepository
 import timber.log.Timber
@@ -40,7 +41,7 @@ class ProjectViewModel : ViewModel() {
         projectModel = TimeLapseProjectModel(
             id = projectId ?: UUID.randomUUID().toString(),
             name = name,
-            interval = interval * 1000L,
+            interval = interval.secToMillis(),
             count = count
         )
         repository.saveProject(projectModel!!)

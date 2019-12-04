@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.project_fragment.*
 import kotlinx.android.synthetic.main.project_fragment.view.*
 import paul.host.camera.R
+import paul.host.camera.common.util.millisToSeconds
 import paul.host.camera.data.model.TimeLapseProjectModel
 import paul.host.camera.service.TimeLapseService
 import paul.host.camera.ui.adapter.ImagesAdapter
@@ -52,7 +53,7 @@ class ProjectFragment : NavigationFragment() {
     }
 
     private fun setProject(project: TimeLapseProjectModel) {
-        val interval = (project.interval / 60000).toString()
+        val interval = project.interval.millisToSeconds().toString()
         val count = project.count.toString()
         et_name.setText(project.name)
         et_interval.setText(interval)
