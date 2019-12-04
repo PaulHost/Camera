@@ -4,6 +4,7 @@ import android.app.Application
 import dagger.Module
 import dagger.Provides
 import paul.host.camera.App
+import paul.host.camera.data.db.dao.ImageDao
 import paul.host.camera.data.db.dao.ProjectDao
 import paul.host.camera.data.repository.ProjectsRepository
 import javax.inject.Singleton
@@ -17,5 +18,6 @@ class AppModule(private val app: App) {
 
     @Singleton
     @Provides
-    fun provideProjectsRepository(projectDao: ProjectDao) = ProjectsRepository(projectDao)
+    fun provideProjectsRepository(projectDao: ProjectDao, imageDao: ImageDao) =
+        ProjectsRepository(projectDao, imageDao)
 }

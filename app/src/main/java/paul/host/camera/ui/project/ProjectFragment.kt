@@ -1,11 +1,13 @@
 package paul.host.camera.ui.project
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.project_fragment.*
 import kotlinx.android.synthetic.main.project_fragment.view.*
 import paul.host.camera.R
@@ -26,15 +28,22 @@ class ProjectFragment : NavigationFragment() {
     private lateinit var viewModel: ProjectViewModel
     private lateinit var adapter: ImagesAdapter
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        viewModel = ViewModelProviders.of(this).get(ProjectViewModel::class.java)
+    }
+
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? = inflater.inflate(R.layout.project_fragment, container, false).apply {
         adapter = ImagesAdapter(navigationListener)
+        images_list.layoutManager = LinearLayoutManager(requireContext())
         images_list.adapter = adapter
-        viewModel = ViewModelProviders.of(this@ProjectFragment).get(ProjectViewModel::class.java)
         viewModel.isEdit = arguments?.getBoolean(ARG_IS_EDIT) ?: false
         viewModel.projectId = arguments?.getString(ARG_PROJECT_ID)
+        btn_start.setOnClickListener { start() }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

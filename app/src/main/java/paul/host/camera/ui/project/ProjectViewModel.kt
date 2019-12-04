@@ -3,6 +3,8 @@ package paul.host.camera.ui.project
 import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
 import io.reactivex.Flowable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import paul.host.camera.App
 import paul.host.camera.data.model.TimeLapseProjectModel
 import paul.host.camera.data.repository.ProjectsRepository
@@ -27,6 +29,8 @@ class ProjectViewModel : ViewModel() {
     } else {
         Flowable.empty()
     }
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
         .map { it as TimeLapseProjectModel }
         .doOnNext {
             projectModel = it
@@ -39,7 +43,10 @@ class ProjectViewModel : ViewModel() {
             interval = interval * 1000L,
             count = count
         )
-        repository.saveProject(projectModel!!).subscribe({}, Timber::e)
+        repository.saveProject(projectModel!!)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({}, Timber::e)
     }
 }
 

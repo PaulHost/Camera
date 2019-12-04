@@ -26,9 +26,11 @@ class ImagesAdapter(private val listener: MainNavigationListener?) :
         }
     }
 
-    fun setList(list: List<String>) {
-        this.list = list.toMutableList()
-        notifyDataSetChanged()
+    fun setList(list: List<String>?) {
+        this.list = list?.let {
+            notifyDataSetChanged()
+            it.toMutableList()
+        } ?: this.list
     }
 }
 

@@ -40,8 +40,12 @@ open class TimeLapseService : Service(), Runnable {
 
     override fun onBind(intent: Intent?): IBinder? {
         Timber.d("MY_LOG: onBind")
-        App.component.inject(this)
         return null
+    }
+
+    init {
+        Timber.d("init")
+        App.component.inject(this)
     }
 
     override fun run() {

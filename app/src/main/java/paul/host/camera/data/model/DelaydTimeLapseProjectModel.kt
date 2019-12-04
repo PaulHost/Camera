@@ -1,7 +1,6 @@
 package paul.host.camera.data.model
 
 import paul.host.camera.common.Constants
-import paul.host.camera.common.util.toImageName
 import paul.host.camera.data.db.entity.ImageEntity
 import paul.host.camera.data.db.entity.ProjectEntity
 import java.util.*
@@ -17,7 +16,7 @@ class DelaydTimeLapseProjectModel(
     var exposureTime: Long
 ) : ProjectModel(id, name, images) {
 
-    constructor(projectEntity: ProjectEntity? = null) : this(
+    constructor(projectEntity: ProjectEntity? = null, images: List<ImageEntity>? = null) : this(
         id = projectEntity?.id ?: UUID.randomUUID().toString(),
         name = projectEntity?.name ?: Constants.EMPTY_STRING,
         removable = projectEntity?.removable ?: false,
@@ -25,7 +24,7 @@ class DelaydTimeLapseProjectModel(
         interval = projectEntity?.interval ?: 0L,
         endTime = projectEntity?.endTime ?: 0L,
         exposureTime = projectEntity?.exposureTime ?: 0L,
-        images = projectEntity?.images?.map { it.path } ?: mutableListOf()
+        images = images?.map { it.path } ?: mutableListOf()
     )
 
     override fun toEntity() = ProjectEntity(
@@ -35,22 +34,7 @@ class DelaydTimeLapseProjectModel(
         startTime = startTime,
         interval = interval,
         endTime = endTime,
-        exposureTime = exposureTime,
-        images = images.toImageEntity()
+        exposureTime = exposureTime
     )
-
-    private fun List<String>.toImageEntity(): List<ImageEntity> {
-        val entities = mutableListOf<ImageEntity>()
-        this.forEachIndexed { i, path ->
-            entities.add(
-                ImageEntity(
-                    projectId = id,
-                    name = "${name}_${i.toImageName(this.size)}",
-                    path = path
-                )
-            )
-        }
-        return entities
-    }
 
 }

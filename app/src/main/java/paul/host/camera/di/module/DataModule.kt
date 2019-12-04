@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.room.Room
 import dagger.Module
 import dagger.Provides
+import paul.host.camera.common.Constants
 import paul.host.camera.data.db.DataBase
 import paul.host.camera.data.db.dao.ImageDao
 import paul.host.camera.data.db.dao.ProjectDao
@@ -15,7 +16,7 @@ class DataModule {
     @Singleton
     @Provides
     fun provideDataBase(app: Application): DataBase =
-        Room.databaseBuilder(app, DataBase::class.java, "database").build()
+        Room.databaseBuilder(app, DataBase::class.java, Constants.DATABASE_NAME).build()
 
     @Singleton
     @Provides

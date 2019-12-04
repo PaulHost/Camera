@@ -22,8 +22,9 @@ class ProjectsAdapter(private val listener: MainNavigationListener?) :
     override fun getItemCount(): Int = list.size
 
     override fun onBindViewHolder(holder: ProjectViewHolder, position: Int) {
-        holder.setImage(list[position].images.first())
-        holder.setTitle(list[position].name)
+        val item = list[position]
+        if (!item.images.isNullOrEmpty()) holder.setImage(item.images.first())
+        holder.setTitle(item.name)
         holder.itemView.setOnClickListener {
             listener?.goToProjectFromProjectsList(list[position].id, false)
         }
@@ -39,12 +40,14 @@ class ProjectsAdapter(private val listener: MainNavigationListener?) :
 class ProjectViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     val imageView = itemView.findViewById<ImageView>(R.id.image_view)
     val title = itemView.findViewById<TextView>(R.id.project_title)
-    fun setImage(url: String) {
-        Glide.with(itemView.context)
-            .load(url)
-            .centerCrop()
+    fun setImage(url: String?) {
+        url?.let {
+            Glide.with(itemView.context)
+                .load(url)
+                .centerCrop()
 //            .placeholder(R.drawable.placeholder)
-            .into(imageView)
+                .into(imageView)
+        }
     }
 
     fun setTitle(title: String) {
