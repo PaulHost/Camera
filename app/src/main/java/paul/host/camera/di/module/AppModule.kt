@@ -6,6 +6,7 @@ import dagger.Provides
 import paul.host.camera.App
 import paul.host.camera.data.db.dao.ImageDao
 import paul.host.camera.data.db.dao.ProjectDao
+import paul.host.camera.data.repository.ImageRepository
 import paul.host.camera.data.repository.ProjectsRepository
 import javax.inject.Singleton
 
@@ -18,6 +19,11 @@ class AppModule(private val app: App) {
 
     @Singleton
     @Provides
-    fun provideProjectsRepository(projectDao: ProjectDao, imageDao: ImageDao) =
-        ProjectsRepository(projectDao, imageDao)
+    fun provideProjectsRepository(projectDao: ProjectDao, imageRepository: ImageRepository) =
+        ProjectsRepository(projectDao, imageRepository)
+
+    @Singleton
+    @Provides
+    fun provideImageRepository(imageDao: ImageDao) = ImageRepository(imageDao)
+
 }

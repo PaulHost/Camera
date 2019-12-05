@@ -13,7 +13,7 @@ import paul.host.camera.ui.navigation.MainNavigationListener
 
 class ProjectsAdapter(private val listener: MainNavigationListener?) :
     RecyclerView.Adapter<ProjectViewHolder>() {
-    private var list = mutableListOf<ProjectModel>()
+    private var list = listOf<ProjectModel>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ProjectViewHolder(
         LayoutInflater.from(parent.context).inflate(R.layout.item_project, parent, false)
@@ -23,7 +23,7 @@ class ProjectsAdapter(private val listener: MainNavigationListener?) :
 
     override fun onBindViewHolder(holder: ProjectViewHolder, position: Int) {
         val item = list[position]
-        if (!item.images.isNullOrEmpty()) holder.setImage(item.images.first())
+        if (!item.images.isNullOrEmpty()) holder.setImage(item.images.first().path)
         holder.setTitle(item.name)
         holder.itemView.setOnClickListener {
             listener?.goToProjectFromProjectsList(list[position].id, false)
@@ -31,7 +31,7 @@ class ProjectsAdapter(private val listener: MainNavigationListener?) :
     }
 
     fun setList(list: List<ProjectModel>) {
-        this.list = list.toMutableList()
+        this.list = list
         notifyDataSetChanged()
     }
 }

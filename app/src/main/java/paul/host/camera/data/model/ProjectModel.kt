@@ -1,7 +1,6 @@
 package paul.host.camera.data.model
 
 import paul.host.camera.common.Constants
-import paul.host.camera.data.db.entity.ImageEntity
 import paul.host.camera.data.db.entity.ProjectEntity
 import java.util.*
 
@@ -14,9 +13,9 @@ class ProjectModel(
     var count: Int = Constants.ZERO,
     var endTime: Long = Constants.ZERO_LONG,
     var exposureTime: Long = Constants.ZERO_LONG,
-    val images: List<String> = mutableListOf()
+    val images: List<ImageModel> = mutableListOf()
 ) {
-    constructor(projectEntity: ProjectEntity? = null, images: List<ImageEntity>? = null) : this(
+    constructor(projectEntity: ProjectEntity? = null, images: List<ImageModel>? = null) : this(
         id = projectEntity?.id ?: UUID.randomUUID().toString(),
         name = projectEntity?.name ?: Constants.EMPTY_STRING,
         removable = projectEntity?.removable ?: false,
@@ -25,7 +24,7 @@ class ProjectModel(
         count = projectEntity?.count ?: Constants.ZERO,
         endTime = projectEntity?.endTime ?: 0L,
         exposureTime = projectEntity?.exposureTime ?: 0L,
-        images = images?.map { it.path } ?: mutableListOf()
+        images = images ?: mutableListOf()
     )
 
     constructor(project: ProjectModel) : this(

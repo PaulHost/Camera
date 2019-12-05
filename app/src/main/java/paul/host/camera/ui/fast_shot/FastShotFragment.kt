@@ -13,18 +13,15 @@ import java.io.File
 class FastShotFragment : CameraFragment(), Runnable {
 
     private lateinit var viewModel: FastShotViewModel
-    private var pictureName: String? = null
-    private var projectId: String? = null
-    private var exposureSeconds: Int? = null
+    private var exposureSeconds: Long? = null
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(FastShotViewModel::class.java)
         val intent = activity?.intent
-        pictureName = intent?.getStringExtra(ARG_PICTURE_NAME)
-        projectId = intent?.getStringExtra(ARG_PROJECT_ID)
-        exposureSeconds = intent?.getIntExtra(ARG_EXPOSURE_SEC, 1)
-        // TODO: Use the ViewModel
+        viewModel.pictureName = intent?.getStringExtra(ARG_PICTURE_NAME)
+        viewModel.projectId = intent?.getStringExtra(ARG_PROJECT_ID)
+        exposureSeconds = intent?.getLongExtra(ARG_EXPOSURE_SEC, 1000L)
     }
 
     override fun onStart() {
@@ -36,7 +33,7 @@ class FastShotFragment : CameraFragment(), Runnable {
         Timber.d("MY_LOG: run taking picture")
         focusView.removeCallbacks(this)
         if (fotoapparat.isAvailable(activeCamera.lensPosition)) {
-            takePicture(pictureName)
+            takePicture(viewModel.pictureName)
         } else {
             focusView.postDelayed(this, PHOTO_DELAY)
         }
@@ -44,6 +41,7 @@ class FastShotFragment : CameraFragment(), Runnable {
 
     override fun onImageSaved(file: File) {
         super.onImageSaved(file)
+        viewModel.saveImageInfo(file)
         focusView.post { navigationListener?.closeCurrentActivity() }
     }
 
