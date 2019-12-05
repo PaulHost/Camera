@@ -1,5 +1,6 @@
 package paul.host.camera.ui.fast_shot
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -10,6 +11,7 @@ import paul.host.camera.ui.camera.CameraFragment
 import timber.log.Timber
 import java.io.File
 
+@SuppressLint("CheckResult")
 class FastShotFragment : CameraFragment(), Runnable {
 
     private lateinit var viewModel: FastShotViewModel
@@ -42,7 +44,9 @@ class FastShotFragment : CameraFragment(), Runnable {
     override fun onImageSaved(file: File) {
         super.onImageSaved(file)
         viewModel.saveImageInfo(file)
-        focusView.post { navigationListener?.closeCurrentActivity() }
+            .subscribe({
+                navigationListener?.closeCurrentActivity()
+            }, Timber::e)
     }
 
     companion object {
