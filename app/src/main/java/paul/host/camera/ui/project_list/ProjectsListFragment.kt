@@ -8,10 +8,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.projects_list_fragment.view.*
 import paul.host.camera.R
-import paul.host.camera.data.model.TimeLapseProjectModel
+import paul.host.camera.data.model.ProjectModel
 import paul.host.camera.ui.adapter.ProjectsAdapter
 import paul.host.camera.ui.navigation.NavigationFragment
 
@@ -46,6 +45,6 @@ class ProjectsListFragment : NavigationFragment() {
         viewModel.getProjects().subscribe(::setProjects, ::onError)
     }
 
-    private fun setProjects(list: List<TimeLapseProjectModel>) = adapter.setList(list)
+    private fun setProjects(list: List<ProjectModel>) = adapter.setList(list)
 
 }

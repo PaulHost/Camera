@@ -2,23 +2,27 @@ package paul.host.camera.data.repository
 
 import io.reactivex.Completable
 import io.reactivex.Flowable
+import io.reactivex.functions.BiFunction
 import paul.host.camera.common.util.toImageEntity
 import paul.host.camera.data.db.dao.ImageDao
 import paul.host.camera.data.db.dao.ProjectDao
+import paul.host.camera.data.db.entity.ImageEntity
+import paul.host.camera.data.db.entity.ProjectEntity
 import paul.host.camera.data.model.ProjectModel
-import paul.host.camera.data.model.TimeLapseProjectModel
 
 class ProjectsRepository(private val projectDao: ProjectDao, private val imageDao: ImageDao) {
-    fun getProjects(): Flowable<List<TimeLapseProjectModel>> = projectDao.projects()
+    fun getProjects(): Flowable<List<ProjectModel>> = projectDao.projects()
         .flatMap { entities ->
             Flowable.fromIterable(entities)
-                .map { TimeLapseProjectModel(it) }
+                .flatMap { Flowable.just(it).zipWith(imageDao.images(it.id), createProjectModel()) }
                 .toList()
                 .toFlowable()
         }
 
     fun getProject(id: String): Flowable<ProjectModel> =
-        projectDao.project(id).map { TimeLapseProjectModel(it) }
+        Flowable.zip(
+            projectDao.project(id), imageDao.images(id), createProjectModel()
+        )
 
     fun updateProject(project: ProjectModel): Completable = projectDao.update(project.toEntity())
 
@@ -28,4 +32,6 @@ class ProjectsRepository(private val projectDao: ProjectDao, private val imageDa
                 ?: Completable.complete()
         )
 
+    private fun createProjectModel(): BiFunction<ProjectEntity, List<ImageEntity>, ProjectModel> =
+        BiFunction { project, images -> ProjectModel(project, images) }
 }

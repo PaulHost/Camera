@@ -56,7 +56,7 @@ class FastShotFragment : CameraFragment(), Runnable {
         fun getIntent(
             projectId: String,
             pictureName: String,
-            exposureSeconds: Int
+            exposureSeconds: Long
         ) =
             Intent(
                 Intent.ACTION_VIEW,
@@ -68,7 +68,7 @@ class FastShotFragment : CameraFragment(), Runnable {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_USER_ACTION
             }
 
-        fun start(context: Context, projectId: String, pictureName: String, exposureSeconds: Int) =
+        fun start(context: Context, projectId: String, pictureName: String, exposureSeconds: Long) =
             context.startActivity(getIntent(projectId, pictureName, exposureSeconds))
     }
 }

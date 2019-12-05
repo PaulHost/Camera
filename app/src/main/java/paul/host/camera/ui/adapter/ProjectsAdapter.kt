@@ -8,12 +8,12 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import paul.host.camera.R
-import paul.host.camera.data.model.TimeLapseProjectModel
+import paul.host.camera.data.model.ProjectModel
 import paul.host.camera.ui.navigation.MainNavigationListener
 
 class ProjectsAdapter(private val listener: MainNavigationListener?) :
     RecyclerView.Adapter<ProjectViewHolder>() {
-    private var list = mutableListOf<TimeLapseProjectModel>()
+    private var list = mutableListOf<ProjectModel>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ProjectViewHolder(
         LayoutInflater.from(parent.context).inflate(R.layout.item_project, parent, false)
@@ -30,7 +30,7 @@ class ProjectsAdapter(private val listener: MainNavigationListener?) :
         }
     }
 
-    fun setList(list: List<TimeLapseProjectModel>) {
+    fun setList(list: List<ProjectModel>) {
         this.list = list.toMutableList()
         notifyDataSetChanged()
     }

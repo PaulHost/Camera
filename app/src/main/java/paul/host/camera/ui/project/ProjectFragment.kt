@@ -12,7 +12,7 @@ import kotlinx.android.synthetic.main.project_fragment.*
 import kotlinx.android.synthetic.main.project_fragment.view.*
 import paul.host.camera.R
 import paul.host.camera.common.util.millisToSeconds
-import paul.host.camera.data.model.TimeLapseProjectModel
+import paul.host.camera.data.model.ProjectModel
 import paul.host.camera.service.TimeLapseService
 import paul.host.camera.ui.adapter.ImagesAdapter
 import paul.host.camera.ui.navigation.NavigationFragment
@@ -52,7 +52,7 @@ class ProjectFragment : NavigationFragment() {
         viewModel.getProject().subscribe(::setProject, ::onError)
     }
 
-    private fun setProject(project: TimeLapseProjectModel) {
+    private fun setProject(project: ProjectModel) {
         val interval = project.interval.millisToSeconds().toString()
         val count = project.count.toString()
         et_name.setText(project.name)

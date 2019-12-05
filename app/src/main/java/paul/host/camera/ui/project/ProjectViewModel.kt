@@ -7,7 +7,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import paul.host.camera.App
 import paul.host.camera.common.util.secToMillis
-import paul.host.camera.data.model.TimeLapseProjectModel
+import paul.host.camera.data.model.ProjectModel
 import paul.host.camera.data.repository.ProjectsRepository
 import timber.log.Timber
 import java.util.*
@@ -17,9 +17,10 @@ import javax.inject.Inject
 class ProjectViewModel : ViewModel() {
     @Inject
     lateinit var repository: ProjectsRepository
-    private var projectModel: TimeLapseProjectModel? = null
+    var projectModel: ProjectModel? = null
     var isEdit = false
     var projectId: String? = null
+        get() = projectModel?.id ?: field
 
     init {
         App.component.inject(this)
@@ -32,13 +33,12 @@ class ProjectViewModel : ViewModel() {
     }
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
-        .map { it as TimeLapseProjectModel }
         .doOnNext {
             projectModel = it
         }
 
     fun save(name: String, interval: Int, count: Int) {
-        projectModel = TimeLapseProjectModel(
+        projectModel = ProjectModel(
             id = projectId ?: UUID.randomUUID().toString(),
             name = name,
             interval = interval.secToMillis(),

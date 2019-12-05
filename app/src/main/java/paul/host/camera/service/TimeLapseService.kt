@@ -15,8 +15,7 @@ import paul.host.camera.App
 import paul.host.camera.common.Constants
 import paul.host.camera.common.util.ServiceManager
 import paul.host.camera.common.util.toImageName
-import paul.host.camera.data.model.DelaydTimeLapseProjectModel
-import paul.host.camera.data.model.TimeLapseProjectModel
+import paul.host.camera.data.model.ProjectModel
 import paul.host.camera.data.repository.ProjectsRepository
 import paul.host.camera.ui.fast_shot.FastShotFragment
 import timber.log.Timber
@@ -26,17 +25,9 @@ import javax.inject.Inject
 open class TimeLapseService : Service(), Runnable {
     @Inject
     lateinit var repository: ProjectsRepository
-
-    private var iterator = 0
+    private lateinit var project: ProjectModel
     private var handler: Handler = Handler(Looper.getMainLooper())
-    private var startTime = System.currentTimeMillis()
-    private var count = 50
-    private var endTime = 0L
-    private var interval: Long = 24000
-        set(minutes) {
-            minutes * (60000)
-            field = minutes
-        }
+    private var iterator = 0
 
     override fun onBind(intent: Intent?): IBinder? {
         Timber.d("MY_LOG: onBind")
@@ -50,12 +41,12 @@ open class TimeLapseService : Service(), Runnable {
 
     override fun run() {
         Timber.d("MY_LOG: takePicture")
-        if (System.currentTimeMillis() < endTime) {
+        if (System.currentTimeMillis() < project.endTime) {
             handler.removeCallbacks(this)
             Timber.d("MY_LOG: opening FastShotFragment")
             takeShot()
             iterator++
-            handler.postDelayed(this, interval)
+            handler.postDelayed(this, project.interval)
         } else {
             Timber.d("MY_LOG: stop")
             application.stopService(getIntent(applicationContext))
@@ -66,17 +57,11 @@ open class TimeLapseService : Service(), Runnable {
     open fun onHandleIntent(intent: Intent?) {
         Timber.d("MY_LOG: onHandleIntent")
         intent?.getStringExtra(EXTRA_PROJECT_ID)?.let(repository::getProject)?.subscribe({
-            if (it is TimeLapseProjectModel) {
-                interval = it.interval
-                startTime = System.currentTimeMillis()
-                endTime = interval * it.count + startTime
-            } else if (it is DelaydTimeLapseProjectModel) {
-                TODO()
-            }
-            if (startTime < System.currentTimeMillis()) {
+            project = ProjectModel(it)
+            if (project.startTime < System.currentTimeMillis()) {
                 handler.post(this)
             } else {
-                handler.postDelayed(this, startTime - System.currentTimeMillis())
+                handler.postDelayed(this, project.startTime - System.currentTimeMillis())
             }
         }, Timber::e)
     }
@@ -121,9 +106,9 @@ open class TimeLapseService : Service(), Runnable {
     open fun takeShot() =
         FastShotFragment.start(
             applicationContext,
-            "test",
-            "test_${iterator.toImageName(count)}",
-            1
+            project.id,
+            "${project.name}_${iterator.toImageName(project.count)}",
+            project.exposureTime
         )
 
     companion object {
