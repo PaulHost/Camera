@@ -3,10 +3,9 @@ package paul.host.camera.ui.fast_shot
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.lifecycle.ViewModelProviders
-import paul.host.camera.common.Constants
+import paul.host.camera.ui.activity.FastShotActivity
 import paul.host.camera.ui.camera.CameraFragment
 import timber.log.Timber
 import java.io.File
@@ -23,7 +22,7 @@ class FastShotFragment : CameraFragment(), Runnable {
         val intent = activity?.intent
         viewModel.pictureName = intent?.getStringExtra(ARG_PICTURE_NAME)
         viewModel.projectId = intent?.getStringExtra(ARG_PROJECT_ID)
-        exposureSeconds = intent?.getLongExtra(ARG_EXPOSURE_SEC, 1000L)
+        exposureSeconds = intent?.getLongExtra(ARG_EXPOSURE, 1000L)
     }
 
     override fun onStart() {
@@ -43,34 +42,40 @@ class FastShotFragment : CameraFragment(), Runnable {
 
     override fun onImageSaved(file: File) {
         super.onImageSaved(file)
-        viewModel.saveImageInfo(file)
-            .subscribe({
-                navigationListener?.closeCurrentActivity()
-            }, Timber::e)
+        viewModel.saveImageInfo(file) { activity?.finish() }
     }
 
     companion object {
         private const val PHOTO_DELAY = 1000L
         const val ARG_PICTURE_NAME = "ARG_PICTURE_NAME"
         const val ARG_PROJECT_ID = "ARG_PROJECT_ID"
-        const val ARG_EXPOSURE_SEC = "ARG_EXPOSURE_SEC"
+        const val ARG_EXPOSURE = "ARG_EXPOSURE_SEC"
 
         fun getIntent(
+            context: Context,
             projectId: String,
             pictureName: String,
             exposureSeconds: Long
-        ) =
-            Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse(Constants.DEEP_LINK_URL.FAST_SHOT_FRAGMENT)
-            ).apply {
-                putExtra(ARG_PROJECT_ID, projectId)
-                putExtra(ARG_PICTURE_NAME, pictureName)
-                putExtra(ARG_EXPOSURE_SEC, exposureSeconds)
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_USER_ACTION
-            }
+        ) = Intent(context, FastShotActivity::class.java).apply {
+            putExtra(ARG_PROJECT_ID, projectId)
+            putExtra(ARG_PICTURE_NAME, pictureName)
+            putExtra(ARG_EXPOSURE, exposureSeconds)
+            addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK
+                        or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        or Intent.FLAG_ACTIVITY_NO_ANIMATION
+                        or Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
+            )
+        }
 
         fun start(context: Context, projectId: String, pictureName: String, exposureSeconds: Long) =
-            context.startActivity(getIntent(projectId, pictureName, exposureSeconds))
+            context.startActivity(
+                getIntent(
+                    context,
+                    projectId,
+                    pictureName,
+                    exposureSeconds
+                )
+            )
     }
 }

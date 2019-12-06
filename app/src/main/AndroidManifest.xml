@@ -19,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".ui.MainNavigationActivity">
+        <activity android:name=".ui.activity.MainNavigationActivity">
             <nav-graph android:value="@navigation/main_graph" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,6 +27,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="paul.host.camera.ui.activity.FastShotActivity"
+            android:autoRemoveFromRecents="true" />
+
         <service
             android:name=".service.TimeLapseService"
             android:enabled="true" />
