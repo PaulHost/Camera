@@ -3,4 +3,8 @@
     <string name="channel_description">Background status notifications</string>
     <string name="stop">Stop</string>
     <string name="start">Start</string>
+    <string name="save">Save</string>
+    <string name="edit">Edit</string>
+    <string name="delete_project">Delete project</string>
+    <string name="build_video">Build video</string>
 </resources>

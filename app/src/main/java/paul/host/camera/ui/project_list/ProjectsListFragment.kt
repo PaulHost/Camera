@@ -3,9 +3,7 @@ package paul.host.camera.ui.project_list
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.projects_list_fragment.view.*

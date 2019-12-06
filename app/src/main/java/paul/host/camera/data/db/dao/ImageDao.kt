@@ -33,4 +33,7 @@ interface ImageDao {
 
     @Delete
     fun delete(image: ImageEntity): Completable
+
+    @Delete
+    fun delete(image: List<ImageEntity>): Completable
 }

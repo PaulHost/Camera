@@ -15,4 +15,6 @@ class ImageRepository(private val imageDao: ImageDao) {
 
     fun getImage(id: Int): Flowable<ImageModel> = imageDao.image(id).map { it.toModel() }
 
+    fun deleteImages(images: List<ImageModel>) = imageDao.delete(images.toImageEntity())
+
 }

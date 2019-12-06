@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="product_menu_group" type="id" />
+    <item name="product_menu_save" type="id" />
+    <item name="product_menu_edit" type="id" />
+    <item name="product_menu_delete_project" type="id" />
+    <item name="product_menu_delete_with_photo" type="id" />
+    <item name="product_menu_build_video" type="id" />
+</resources>

@@ -3,19 +3,19 @@ package paul.host.camera.ui.project
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.project_fragment.*
 import kotlinx.android.synthetic.main.project_fragment.view.*
 import paul.host.camera.R
 import paul.host.camera.common.util.millisToSeconds
+import paul.host.camera.common.util.recreate
 import paul.host.camera.data.model.ProjectModel
 import paul.host.camera.service.TimeLapseService
 import paul.host.camera.ui.adapter.ImagesAdapter
 import paul.host.camera.ui.navigation.NavigationFragment
+import timber.log.Timber
 
 
 @SuppressLint("CheckResult")
@@ -39,6 +39,7 @@ class ProjectFragment : NavigationFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? = inflater.inflate(R.layout.project_fragment, container, false).apply {
+        setHasOptionsMenu(true)
         adapter = ImagesAdapter(navigationListener)
         images_list.layoutManager = LinearLayoutManager(requireContext())
         images_list.adapter = adapter
@@ -52,6 +53,45 @@ class ProjectFragment : NavigationFragment() {
         viewModel.getProject().subscribe(::setProject, ::onError)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        if (viewModel.isEdit) {
+            menu.add(
+                R.id.product_menu_group,
+                R.id.product_menu_save,
+                Menu.FLAG_ALWAYS_PERFORM_CLOSE,
+                R.string.save
+            )
+        } else {
+            menu.add(
+                R.id.product_menu_group,
+                R.id.product_menu_edit,
+                Menu.FLAG_ALWAYS_PERFORM_CLOSE,
+                R.string.edit
+            )
+        }
+        menu.add(
+            R.id.product_menu_group,
+            R.id.product_menu_delete_project,
+            Menu.FLAG_ALWAYS_PERFORM_CLOSE,
+            R.string.delete_project
+        )
+        menu.add(
+            R.id.product_menu_group, R.id.product_menu_build_video,
+            Menu.FLAG_ALWAYS_PERFORM_CLOSE, R.string.build_video
+        )
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.product_menu_save -> save()
+            R.id.product_menu_edit -> viewModel.isEdit = true
+            R.id.product_menu_delete_project -> deleteProject { this.recreate() }
+            R.id.product_menu_build_video -> save()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     private fun setProject(project: ProjectModel) {
         val interval = project.interval.millisToSeconds().toString()
         val count = project.count.toString()
@@ -61,16 +101,16 @@ class ProjectFragment : NavigationFragment() {
         adapter.setList(project.images)
     }
 
-    private fun start() {
-        save()
-        TimeLapseService.start(requireContext(), viewModel.projectId)
-    }
+    private fun start() = save { TimeLapseService.start(requireContext(), viewModel.projectId) }
 
-    private fun save() {
-        viewModel.save(
-            et_name.text.toString(),
-            et_interval.text.toString().toInt(),
-            et_count.text.toString().toInt()
-        )
-    }
+    private fun save(function: () -> Unit = {}) = viewModel.save(
+        et_name.text.toString(),
+        et_interval.text.toString().toInt(),
+        et_count.text.toString().toInt()
+    ).subscribe({ function() }, Timber::e)
+
+
+    private fun deleteProject(function: () -> Unit = {}) =
+        viewModel.deleteProject().subscribe({ function() }, Timber::e)
+
 }

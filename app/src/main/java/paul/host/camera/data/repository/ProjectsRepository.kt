@@ -7,6 +7,7 @@ import paul.host.camera.data.db.dao.ProjectDao
 import paul.host.camera.data.db.entity.ProjectEntity
 import paul.host.camera.data.model.ImageModel
 import paul.host.camera.data.model.ProjectModel
+import java.io.File
 
 class ProjectsRepository(
     private val projectDao: ProjectDao,
@@ -33,4 +34,15 @@ class ProjectsRepository(
 
     private fun createProjectModel(): BiFunction<ProjectEntity, List<ImageModel>, ProjectModel> =
         BiFunction { project, images -> ProjectModel(project, images) }
+
+    fun deleteProject(project: ProjectModel): Completable = Completable.concatArray(
+        projectDao.delete(project.toEntity()),
+        imageRepository.deleteImages(project.images),
+        Completable.fromAction {
+            project.images.forEach {
+                File(it.path).delete()
+            }
+        }
+    )
+
 }

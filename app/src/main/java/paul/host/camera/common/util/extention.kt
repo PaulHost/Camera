@@ -1,5 +1,7 @@
 package paul.host.camera.common.util
 
+import androidx.fragment.app.Fragment
+
 fun Int.toImageName(): String = when {
     this < 10 -> "00$this"
     this < 100 -> "0$this"
@@ -21,3 +23,4 @@ fun Long.millisToSeconds(): Int = (this / 1000).toInt()
 
 fun Int.secToMillis(): Long = this * 1000L
 
+fun Fragment.recreate() = fragmentManager?.beginTransaction()?.detach(this)?.attach(this)?.commit()

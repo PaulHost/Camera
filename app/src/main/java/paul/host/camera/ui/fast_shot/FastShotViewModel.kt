@@ -2,9 +2,8 @@ package paul.host.camera.ui.fast_shot
 
 import androidx.lifecycle.ViewModel
 import io.reactivex.Flowable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import paul.host.camera.App
+import paul.host.camera.common.util.rx.fromIoToMainThread
 import paul.host.camera.data.model.ImageModel
 import paul.host.camera.data.repository.ImageRepository
 import java.io.File
@@ -27,8 +26,6 @@ class FastShotViewModel : ViewModel() {
             name = pictureName ?: System.currentTimeMillis().toString(),
             path = file.absolutePath
         )
-    ).flatMapCompletable(repository::saveImage)
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
+    ).flatMapCompletable(repository::saveImage).fromIoToMainThread()
 
 }
