@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import paul.host.camera.common.Constants
@@ -49,7 +48,7 @@ class VideoService : Service() {
                     )
                     .setOngoing(true).build()
 
-                TODO("Implementing of video creation")
+//                TODO("Implementing of video creation")
 
                 startForeground(Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE, notification)
             }
@@ -120,19 +119,6 @@ class VideoService : Service() {
             action = Constants.ACTION.START_FOREGROUND_ACTION
         }
 
-        fun startDefault(context: Context) {
-            val intent = getIntent(
-                context = context,
-                fps = 25,
-                iName = "${Constants.FOLDERS.mediaDirFile(context)}/$${Constants.NAMES.TIME_LAPSE}",
-                vName = "${Constants.FOLDERS.externalStorageDirFile()}/${Constants.NAMES.TIME_LAPSE}"
-            )
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(intent)
-            } else {
-                context.startService(intent)
-            }
-        }
     }
 
 }
