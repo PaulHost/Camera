@@ -1,4 +1,4 @@
-package paul.host.camera.ui.camera
+package paul.host.camera.ui.activity
 
 import android.os.Build
 import android.view.WindowManager

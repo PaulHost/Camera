@@ -6,6 +6,7 @@ import paul.host.camera.App
 import paul.host.camera.common.util.rx.fromIoToMainThread
 import paul.host.camera.data.model.ImageModel
 import paul.host.camera.data.repository.ImageRepository
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -20,12 +21,13 @@ class FastShotViewModel : ViewModel() {
         App.component.inject(this)
     }
 
-    fun saveImageInfo(file: File) = Flowable.just(
+    fun saveImageInfo(file: File, function: () -> Unit = {}) = Flowable.just(
         ImageModel(
             projectId = projectId ?: throw NullPointerException("Project id is null"),
             name = pictureName ?: System.currentTimeMillis().toString(),
             path = file.absolutePath
         )
     ).flatMapCompletable(repository::saveImage).fromIoToMainThread()
+        .subscribe({ function() }, Timber::e)
 
 }

@@ -34,8 +34,6 @@ class ProjectsListFragment : NavigationFragment() {
         fab_create.setOnClickListener {
             navigationListener?.goToProjectFromProjectsList(null, true)
         }
-        viewModel =
-            ViewModelProviders.of(this@ProjectsListFragment).get(ProjectsListViewModel::class.java)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

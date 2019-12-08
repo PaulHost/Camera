@@ -39,10 +39,6 @@
         android:name="paul.host.camera.ui.fast_shot.FastShotFragment"
         android:label="fast_shot_fragment"
         tools:layout="@layout/camera_fragment">
-        <deepLink
-            android:id="@+id/deepLink"
-            app:uri="camera://timelapse/fast_shot"
-            android:autoVerify="true" />
         <action
             android:id="@+id/action_fastShotFragment_to_projectFragment"
             app:destination="@id/projectFragment"

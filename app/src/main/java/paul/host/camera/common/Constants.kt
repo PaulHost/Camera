@@ -36,7 +36,4 @@ object Constants {
         fun externalStorageDirFile(): File = Environment.getExternalStorageDirectory()
     }
 
-    object DEEP_LINK_URL {
-        const val FAST_SHOT_FRAGMENT = "camera://timelapse/fast_shot"
-    }
 }
