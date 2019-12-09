@@ -106,11 +106,7 @@ open class CameraFragment : NavigationFragment() {
             Camera.Front -> Camera.Back
             Camera.Back -> Camera.Front
         }
-
-        fotoapparat.switchTo(
-            lensPosition = activeCamera.lensPosition,
-            cameraConfiguration = activeCamera.configuration
-        )
+        fotoapparat.switchTo(activeCamera)
     }
 
     private fun takePicture(file: File) = fotoapparat.takePicture().apply {
@@ -139,6 +135,10 @@ open class CameraFragment : NavigationFragment() {
             requireContext(), it
         ) == PackageManager.PERMISSION_GRANTED
     }
+}
+
+fun Fotoapparat.switchTo(camera: Camera) {
+    switchTo(lensPosition = camera.lensPosition, cameraConfiguration = camera.configuration)
 }
 
 sealed class Camera(
