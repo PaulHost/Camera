@@ -7,4 +7,5 @@
     <string name="edit">Edit</string>
     <string name="delete_project">Delete project</string>
     <string name="build_video">Build video</string>
+    <string name="build_gif">Build GIF</string>
 </resources>

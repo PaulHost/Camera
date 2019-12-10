@@ -10,16 +10,29 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import io.reactivex.Completable
+import paul.host.camera.App
 import paul.host.camera.common.Constants
+import paul.host.camera.common.gif.RxGif
 import paul.host.camera.common.util.ServiceManager
+import paul.host.camera.common.util.rx.fromIoToMainThread
+import paul.host.camera.data.model.ImageModel
+import paul.host.camera.data.repository.ImageRepository
 import timber.log.Timber
+import javax.inject.Inject
 
 
 class VideoService : Service() {
+    @Inject
+    lateinit var repository: ImageRepository
+    private lateinit var imges: List<ImageModel>
     private val name = this::class.java.simpleName
     private val notificationBuilder = NotificationCompat.Builder(this, name)
-    private val notificationManager =
-        getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    private lateinit var notificationManager: NotificationManager
+
+    init {
+        App.component.inject(this)
+    }
 
     override fun onBind(intent: Intent?): IBinder? {
         Timber.d("MY_LOG: onBind")
@@ -36,6 +49,9 @@ class VideoService : Service() {
                     resources,
                     R.drawable.ic_menu_camera
                 )
+                notificationManager =
+                    applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
                 val notification = notificationBuilder
                     .setContentTitle("Making Video")
                     .setTicker(name)
@@ -49,9 +65,10 @@ class VideoService : Service() {
                     )
                     .setOngoing(true).build()
 
-                TODO("Implementing of video creation")
+                handleIntent(intent)?.fromIoToMainThread()?.subscribe({
+                    startForeground(Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE, notification)
+                }, ::onError)
 
-                startForeground(Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE, notification)
             }
             Constants.ACTION.STOP_FOREGROUND_ACTION -> {
                 Timber.d("MY_LOG: Stop action")
@@ -61,6 +78,30 @@ class VideoService : Service() {
         }
 
         return START_STICKY
+    }
+
+    private fun handleIntent(intent: Intent) = intent.getStringExtra(EXTRA_PROJECT_ID)
+        ?.let { id ->
+            repository.getImages(id).doFinally {
+                onFinish()
+            }.doOnNext {
+                imges = it
+            }.flatMapCompletable {
+                if (intent.getBooleanExtra(EXTRA_IS_GIF, false)) {
+                    createGif(imges.first().name)
+                } else {
+                    createVideo()
+                }
+            }
+        }
+
+    private fun createVideo(): Completable = Completable.complete()
+
+    private fun createGif(name: String): RxGif = RxGif(name).apply {
+        imges.forEachIndexed { i, image ->
+            onProgress((i / imges.size) * 100)
+            next(BitmapFactory.decodeFile(image.path))
+        }
     }
 
     fun onFinish() {
@@ -91,9 +132,9 @@ class VideoService : Service() {
         )
     }
 
-    fun onError(message: String) {
-        Timber.d("onError：$message")
-        notificationBuilder.setContentText("Error: $message")
+    fun onError(throwable: Throwable) {
+        Timber.d(throwable)
+        notificationBuilder.setContentText("Error: ${throwable.message}")
             .setProgress(0, 0, false)
         notificationManager.notify(
             Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE,
@@ -104,9 +145,16 @@ class VideoService : Service() {
     companion object {
         private const val EXTRA_IMAGE_NAME = "EXTRA_IMAGE_NAME"
         private const val EXTRA_VIDEO_NAME = "EXTRA_VIDEO_NAME"
+        private const val EXTRA_PROJECT_ID = "EXTRA_PROJECT_ID"
+        private const val EXTRA_IS_GIF = "EXTRA_IS_GIF"
         private const val EXTRA_FPS = "EXTRA_FPS"
 
         fun getIntent(context: Context) = Intent(context, VideoService::class.java)
+
+        fun getIntent(context: Context, projectId: String, isGif: Boolean) =
+            getIntent(context).putExtra(EXTRA_IS_GIF, isGif)
+                .putExtra(EXTRA_PROJECT_ID, projectId)
+                .setAction(Constants.ACTION.START_FOREGROUND_ACTION)
 
         fun getIntent(
             context: Context,
@@ -120,13 +168,11 @@ class VideoService : Service() {
             action = Constants.ACTION.START_FOREGROUND_ACTION
         }
 
-        fun startDefault(context: Context) {
-            val intent = getIntent(
-                context = context,
-                fps = 25,
-                iName = "${Constants.FOLDERS.mediaDirFile(context)}/$${Constants.NAMES.TIME_LAPSE}",
-                vName = "${Constants.FOLDERS.externalStorageDirFile()}/${Constants.NAMES.TIME_LAPSE}"
-            )
+        fun startGif(context: Context, projectId: String) {
+            start(context, getIntent(context, projectId, true))
+        }
+
+        fun start(context: Context, intent: Intent) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(intent)
             } else {

@@ -9,6 +9,7 @@ import paul.host.camera.common.util.rx.fromIoToMainThread
 import paul.host.camera.common.util.secToMillis
 import paul.host.camera.data.model.ProjectModel
 import paul.host.camera.data.repository.ProjectsRepository
+import paul.host.camera.service.VideoService
 import java.util.*
 import javax.inject.Inject
 
