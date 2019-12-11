@@ -16,6 +16,7 @@ import paul.host.camera.common.Constants
 import paul.host.camera.common.gif.RxGif
 import paul.host.camera.common.util.ServiceManager
 import paul.host.camera.common.util.rx.fromIoToMainThread
+import paul.host.camera.common.util.rx.newThread
 import paul.host.camera.data.model.ImageModel
 import paul.host.camera.data.repository.ImageRepository
 import timber.log.Timber
@@ -65,7 +66,7 @@ class VideoService : Service() {
                     )
                     .setOngoing(true).build()
 
-                handleIntent(intent)?.fromIoToMainThread()?.subscribe({
+                handleIntent(intent)?.newThread()?.subscribe({
                     startForeground(Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE, notification)
                 }, ::onError)
 
@@ -87,6 +88,7 @@ class VideoService : Service() {
             }.doOnNext {
                 imges = it
             }.flatMapCompletable {
+                Timber.d("MY_LOG: handleIntent: list_size=%s", it.size)
                 if (intent.getBooleanExtra(EXTRA_IS_GIF, false)) {
                     createGif(imges.first().name)
                 } else {
@@ -98,13 +100,19 @@ class VideoService : Service() {
     private fun createVideo(): Completable = Completable.complete()
 
     private fun createGif(name: String): RxGif = RxGif(name).apply {
+        Timber.d("MY_LOG: createGif")
         imges.forEachIndexed { i, image ->
-            onProgress((i / imges.size) * 100)
-            next(BitmapFactory.decodeFile(image.path))
+            val persent = (i / imges.size) * 100
+            Timber.d("MY_LOG:  %=$persent image=${image.path}")
+            onProgress(persent)
+            var bitmap = BitmapFactory.decodeFile(image.path)
+            onNext(bitmap)
+            bitmap.recycle()
         }
     }
 
-    fun onFinish() {
+    private fun onFinish() {
+        Timber.d("MY_LOG: onFinish")
         Timber.d(Constants.SUCCESSFUL)
         notificationBuilder.setContentText(Constants.SUCCESSFUL)
             .setProgress(0, 0, false)
@@ -114,7 +122,8 @@ class VideoService : Service() {
         )
     }
 
-    fun onProgress(progress: Int) {
+    private fun onProgress(progress: Int) {
+        Timber.d("MY_LOG: onProgress")
         notificationBuilder.setProgress(100, progress, false)
         notificationManager.notify(
             Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE,
@@ -123,7 +132,7 @@ class VideoService : Service() {
     }
 
     fun onCancel() {
-        Timber.d("onCancel")
+        Timber.d("MY_LOG: onCancel")
         notificationBuilder.setContentText(Constants.CANCELED)
             .setProgress(0, 0, false)
         notificationManager.notify(
@@ -133,7 +142,7 @@ class VideoService : Service() {
     }
 
     fun onError(throwable: Throwable) {
-        Timber.d(throwable)
+        Timber.e(throwable)
         notificationBuilder.setContentText("Error: ${throwable.message}")
             .setProgress(0, 0, false)
         notificationManager.notify(
@@ -168,9 +177,8 @@ class VideoService : Service() {
             action = Constants.ACTION.START_FOREGROUND_ACTION
         }
 
-        fun startGif(context: Context, projectId: String) {
+        fun startGif(context: Context, projectId: String) =
             start(context, getIntent(context, projectId, true))
-        }
 
         fun start(context: Context, intent: Intent) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
