@@ -13,6 +13,7 @@ import paul.host.camera.common.util.millisToSeconds
 import paul.host.camera.common.util.recreate
 import paul.host.camera.data.model.ProjectModel
 import paul.host.camera.service.TimeLapseService
+import paul.host.camera.service.VideoService
 import paul.host.camera.ui.adapter.ImagesAdapter
 import paul.host.camera.ui.navigation.NavigationFragment
 import timber.log.Timber
@@ -56,27 +57,31 @@ class ProjectFragment : NavigationFragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         if (viewModel.isEdit) {
             menu.add(
-                R.id.product_menu_group,
-                R.id.product_menu_save,
+                R.id.project_menu_group,
+                R.id.project_menu_save,
                 Menu.FLAG_ALWAYS_PERFORM_CLOSE,
                 R.string.save
             )
         } else {
             menu.add(
-                R.id.product_menu_group,
-                R.id.product_menu_edit,
+                R.id.project_menu_group,
+                R.id.project_menu_edit,
                 Menu.FLAG_ALWAYS_PERFORM_CLOSE,
                 R.string.edit
             )
         }
         menu.add(
-            R.id.product_menu_group,
-            R.id.product_menu_delete_project,
+            R.id.project_menu_group,
+            R.id.project_menu_delete_project,
             Menu.FLAG_ALWAYS_PERFORM_CLOSE,
             R.string.delete_project
         )
         menu.add(
-            R.id.product_menu_group, R.id.product_menu_build_video,
+            R.id.project_menu_group, R.id.project_menu_build_gif,
+            Menu.FLAG_ALWAYS_PERFORM_CLOSE, R.string.build_gif
+        )
+        menu.add(
+            R.id.project_menu_group, R.id.project_menu_build_video,
             Menu.FLAG_ALWAYS_PERFORM_CLOSE, R.string.build_video
         )
         super.onCreateOptionsMenu(menu, inflater)
@@ -84,12 +89,17 @@ class ProjectFragment : NavigationFragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.product_menu_save -> save()
-            R.id.product_menu_edit -> viewModel.isEdit = true
-            R.id.product_menu_delete_project -> deleteProject { this.recreate() }
-            R.id.product_menu_build_video -> save()
+            R.id.project_menu_save -> save()
+            R.id.project_menu_edit -> viewModel.isEdit = true
+            R.id.project_menu_delete_project -> deleteProject { this.recreate() }
+            R.id.project_menu_build_gif -> buildGif()
+            R.id.project_menu_build_video -> save()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun buildGif() {
+        save { VideoService.startGif(requireContext(), viewModel.projectId!!) }
     }
 
     private fun setProject(project: ProjectModel) {
