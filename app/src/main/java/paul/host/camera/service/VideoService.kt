@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import io.reactivex.Completable
@@ -70,7 +69,6 @@ class VideoService : Service() {
                 }?.subscribe({
                     startForeground(Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE, notification)
                 }, ::onError)
-
             }
             Constants.ACTION.STOP_FOREGROUND_ACTION -> {
                 Timber.d("MY_LOG: Stop action")

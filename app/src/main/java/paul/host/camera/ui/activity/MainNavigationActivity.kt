@@ -1,12 +1,9 @@
-package paul.host.camera.ui
+package paul.host.camera.ui.activity
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import paul.host.camera.R
-import paul.host.camera.ui.camera.CameraActivity
 import paul.host.camera.ui.image.ImageFragment
 import paul.host.camera.ui.navigation.MainNavigationListener
 import paul.host.camera.ui.project.ProjectFragment
@@ -21,8 +18,6 @@ class MainNavigationActivity : CameraActivity(), MainNavigationListener {
         navController = Navigation.findNavController(this, R.id.nav_host_fragment)
     }
 
-    override fun closeCurrentActivity() = finish()
-
     override fun goToProjectsListScreen() = navController.navigate(
         R.id.action_cameraFragment_to_projectsListFragment
     )
@@ -35,13 +30,6 @@ class MainNavigationActivity : CameraActivity(), MainNavigationListener {
                 putBoolean(ProjectFragment.ARG_IS_EDIT, isEdit)
             }
         )
-
-    override fun goToProjectFromFastShot(projectId: String) = navController.navigate(
-        R.id.action_fastShotFragment_to_projectFragment,
-        Bundle().apply {
-            putString(ProjectFragment.ARG_PROJECT_ID, projectId)
-        }
-    )
 
     override fun goToImageFromCamera(imageId: String) = navController.navigate(
         R.id.action_cameraFragment_to_imageFragment,
@@ -57,7 +45,4 @@ class MainNavigationActivity : CameraActivity(), MainNavigationListener {
         }
     )
 
-    companion object {
-        fun getIntent(context: Context) = Intent(context, MainNavigationActivity::class.java)
-    }
 }
