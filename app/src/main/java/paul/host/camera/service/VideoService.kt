@@ -15,7 +15,6 @@ import paul.host.camera.App
 import paul.host.camera.common.Constants
 import paul.host.camera.common.gif.RxGif
 import paul.host.camera.common.util.ServiceManager
-import paul.host.camera.common.util.rx.fromIoToMainThread
 import paul.host.camera.common.util.rx.newThread
 import paul.host.camera.data.model.ImageModel
 import paul.host.camera.data.repository.ImageRepository
@@ -66,7 +65,9 @@ class VideoService : Service() {
                     )
                     .setOngoing(true).build()
 
-                handleIntent(intent)?.newThread()?.subscribe({
+                handleIntent(intent)?.newThread()?.doOnComplete {
+                    stop(this)
+                }?.subscribe({
                     startForeground(Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE, notification)
                 }, ::onError)
 
@@ -99,15 +100,20 @@ class VideoService : Service() {
 
     private fun createVideo(): Completable = Completable.complete()
 
-    private fun createGif(name: String): RxGif = RxGif(name).apply {
+    private fun createGif(name: String): RxGif {
         Timber.d("MY_LOG: createGif")
-        imges.forEachIndexed { i, image ->
-            val persent = (i / imges.size) * 100
-            Timber.d("MY_LOG:  %=$persent image=${image.path}")
-            onProgress(persent)
-            var bitmap = BitmapFactory.decodeFile(image.path)
-            onNext(bitmap)
-            bitmap.recycle()
+        var bitmap: Bitmap
+        return RxGif(name).apply {
+            imges.forEachIndexed { i, image ->
+                val percent = (i + 1) * 100 / imges.size
+                Timber.d("MY_LOG:  $percent${'%'} image=${image.path}")
+                onProgress(percent)
+                bitmap = BitmapFactory.decodeFile(image.path, BitmapFactory.Options().apply {
+                    inSampleSize = 8
+                })
+                onNext(bitmap)
+                bitmap.recycle()
+            }
         }
     }
 
@@ -131,7 +137,7 @@ class VideoService : Service() {
         )
     }
 
-    fun onCancel() {
+    private fun onCancel() {
         Timber.d("MY_LOG: onCancel")
         notificationBuilder.setContentText(Constants.CANCELED)
             .setProgress(0, 0, false)
@@ -139,9 +145,10 @@ class VideoService : Service() {
             Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE,
             notificationBuilder.build()
         )
+        stop(this)
     }
 
-    fun onError(throwable: Throwable) {
+    private fun onError(throwable: Throwable) {
         Timber.e(throwable)
         notificationBuilder.setContentText("Error: ${throwable.message}")
             .setProgress(0, 0, false)
@@ -187,6 +194,10 @@ class VideoService : Service() {
                 context.startService(intent)
             }
         }
+
+        fun stop(context: Context) = context.stopService(
+            getIntent(context).setAction(Constants.ACTION.STOP_FOREGROUND_ACTION)
+        )
     }
 
 }

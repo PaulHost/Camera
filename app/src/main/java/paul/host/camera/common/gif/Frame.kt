@@ -4,10 +4,11 @@ import android.graphics.Bitmap
 import android.util.Size
 import androidx.core.graphics.get
 
+typealias Frames = List<Frame>
 
-data class Frame(
+class Frame(
     /**
-     * Resolution of the frame in pixels (before rotation).
+     * Resolution of the frame in pixels.
      */
     val size: Size,
     /**
@@ -51,14 +52,40 @@ data class Frame(
 
 }
 
+fun List<Bitmap>.toFrames(): Frames {
+    val result = mutableListOf<Frame>()
+    val image = Array(first().height) { IntArray(first().width) }
+    forEach {
+        it.to2DRGB(image)
+        result.add(
+            Frame(
+                Size(it.width, it.height),
+                image
+            )
+        )
+        it.recycle()
+    }
+    return result
+}
+
+fun Bitmap.toFrame(): Frame {
+    val frame = Frame.create(this)
+    this.recycle()
+    return frame
+}
+
 fun Bitmap.to2DRGB(): Array<IntArray> {
     val width: Int = this.width
     val height: Int = this.height
     val result = Array(height) { IntArray(width) }
+    to2DRGB(result)
+    return result
+}
+
+fun Bitmap.to2DRGB(result: Array<IntArray>) {
     for (row in 0 until height) {
         for (col in 0 until width) {
             result[row][col] = this[col, row]
         }
     }
-    return result
 }

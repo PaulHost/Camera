@@ -14,7 +14,7 @@ import java.io.FileOutputStream
 import java.io.OutputStream
 
 
-class Gif(private val frames: List<Frame>) {
+class Gif(private val frames: Frames) {
     fun save(path: String, progress: (Int) -> Unit = {}) {
         val outputStream: OutputStream = FileOutputStream(path)
         val options = ImageOptions()
@@ -39,39 +39,21 @@ class RxGif(name: String = System.currentTimeMillis().toString()) : CompletableS
     private var outputStream: OutputStream? = null
     private var gifEncoder: GifEncoder? = null
     private val options = ImageOptions()
+    private var frame: Frame? = null
 
     init {
         outputStream = FileOutputStream(path)
     }
 
-    fun onNext(bitmap: Bitmap): RxGif {
-        Timber.d("MY_LOG: onNext")
-        gifEncoder(bitmap).addImage(bitmap.to2DRGB(), options)
-        return this
-    }
-
-    override fun subscribe(co: CompletableObserver) {
+    override fun subscribe(observer: CompletableObserver) {
         Timber.d("MY_LOG: subscribe")
-        co.onSubscribe(this)
+        observer.onSubscribe(this)
         if (File(path).exists()) {
-            co.onComplete()
+            observer.onComplete()
         } else {
-            co.onError(FileNotFoundException("File is not created"))
+            observer.onError(FileNotFoundException("File is not created"))
         }
         dispose()
-    }
-
-    private fun gifEncoder(bitmap: Bitmap): GifEncoder {
-        gifEncoder = if (gifEncoder == null) {
-            GifEncoder(
-                outputStream,
-                bitmap.width,
-                bitmap.height,
-                0
-            )
-        } else gifEncoder
-
-        return gifEncoder!!
     }
 
     override fun isDisposed(): Boolean = gifEncoder == null && outputStream == null
@@ -82,6 +64,27 @@ class RxGif(name: String = System.currentTimeMillis().toString()) : CompletableS
         gifEncoder = null
         outputStream?.close()
         outputStream = null
+    }
+
+    fun onNext(bitmap: Bitmap): RxGif {
+        Timber.d("MY_LOG: onNext")
+        frame = bitmap.toFrame()
+        gifEncoder().addImage(frame!!.image, options)
+        return this
+    }
+
+    private fun gifEncoder(): GifEncoder {
+        Timber.d("MY_LOG: gifEncoder")
+        gifEncoder = if (gifEncoder == null) {
+            GifEncoder(
+                outputStream,
+                frame!!.size.width,
+                frame!!.size.height,
+                0
+            )
+        } else gifEncoder
+
+        return gifEncoder!!
     }
 
 }
