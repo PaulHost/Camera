@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import io.reactivex.Completable
@@ -64,9 +65,7 @@ class VideoService : Service() {
                     )
                     .setOngoing(true).build()
 
-                handleIntent(intent)?.newThread()?.doOnComplete {
-                    stop(this)
-                }?.subscribe({
+                handleIntent(intent)?.newThread()?.subscribe({
                     startForeground(Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE, notification)
                 }, ::onError)
             }
@@ -82,18 +81,23 @@ class VideoService : Service() {
 
     private fun handleIntent(intent: Intent) = intent.getStringExtra(EXTRA_PROJECT_ID)
         ?.let { id ->
-            repository.getImages(id).doFinally {
-                onFinish()
-            }.doOnNext {
-                imges = it
-            }.flatMapCompletable {
-                Timber.d("MY_LOG: handleIntent: list_size=%s", it.size)
-                if (intent.getBooleanExtra(EXTRA_IS_GIF, false)) {
-                    createGif(imges.first().name)
-                } else {
-                    createVideo()
+            repository.getImages(id)
+                .doOnComplete {
+                    stop(this)
+                }.doFinally {
+                    onFinish()
+                }.doOnNext {
+                    imges = it
+                }.flatMapCompletable {
+                    Timber.d("MY_LOG: handleIntent: list_size=%s", it.size)
+                    if (intent.getBooleanExtra(EXTRA_IS_GIF, false)) {
+                        createGif(imges.first().name)
+                    } else {
+                        createVideo()
+                    }
+                }.doOnComplete {
+                    Timber.d("MY_LOG: complete")
                 }
-            }
         }
 
     private fun createVideo(): Completable = Completable.complete()
@@ -105,7 +109,7 @@ class VideoService : Service() {
             imges.forEachIndexed { i, image ->
                 val percent = (i + 1) * 100 / imges.size
                 Timber.d("MY_LOG:  $percent${'%'} image=${image.path}")
-                onProgress(percent)
+                notify("$percent${'%'}", percent)
                 bitmap = BitmapFactory.decodeFile(image.path, BitmapFactory.Options().apply {
                     inSampleSize = 8
                 })
@@ -117,45 +121,31 @@ class VideoService : Service() {
 
     private fun onFinish() {
         Timber.d("MY_LOG: onFinish")
-        Timber.d(Constants.SUCCESSFUL)
-        notificationBuilder.setContentText(Constants.SUCCESSFUL)
-            .setProgress(0, 0, false)
-        notificationManager.notify(
-            Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE,
-            notificationBuilder.build()
-        )
-    }
-
-    private fun onProgress(progress: Int) {
-        Timber.d("MY_LOG: onProgress")
-        notificationBuilder.setProgress(100, progress, false)
-        notificationManager.notify(
-            Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE,
-            notificationBuilder.build()
-        )
+        notify(Constants.SUCCESSFUL)
+        stop(this)
     }
 
     private fun onCancel() {
         Timber.d("MY_LOG: onCancel")
-        notificationBuilder.setContentText(Constants.CANCELED)
-            .setProgress(0, 0, false)
-        notificationManager.notify(
-            Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE,
-            notificationBuilder.build()
-        )
+        notify(Constants.CANCELED)
         stop(this)
     }
 
     private fun onError(throwable: Throwable) {
         Timber.e(throwable)
-        notificationBuilder.setContentText("Error: ${throwable.message}")
-            .setProgress(0, 0, false)
+        notify(throwable.message)
+    }
+
+    private fun notify(message: String? = null, progress: Int = 0) {
+        if (message != null) notificationBuilder.setContentText(message)
+        if (progress == 0) notificationBuilder.setProgress(100, progress, false)
         notificationManager.notify(
             Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE,
             notificationBuilder.build()
         )
     }
 
+    @Suppress("MemberVisibilityCanBePrivate")
     companion object {
         private const val EXTRA_IMAGE_NAME = "EXTRA_IMAGE_NAME"
         private const val EXTRA_VIDEO_NAME = "EXTRA_VIDEO_NAME"
