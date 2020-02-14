@@ -15,7 +15,7 @@ import paul.host.camera.App
 import paul.host.camera.common.Constants
 import paul.host.camera.common.gif.RxGif
 import paul.host.camera.common.util.ServiceManager
-import paul.host.camera.common.util.rx.newThread
+import paul.host.camera.common.util.rx.computationThread
 import paul.host.camera.data.model.ImageModel
 import paul.host.camera.data.repository.ImageRepository
 import timber.log.Timber
@@ -65,9 +65,14 @@ class VideoService : Service() {
                     )
                     .setOngoing(true).build()
 
-                handleIntent(intent)?.newThread()?.subscribe({
-                    startForeground(Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE, notification)
-                }, ::onError)
+                handleIntent(intent)?.computationThread()
+                    ?.doOnSubscribe {
+                        startForeground(
+                            Constants.NOTIFICATION_ID.VIDEO_MAKER_SERVICE,
+                            notification
+                        )
+                    }
+                    ?.subscribe({ Timber.d("MY_LOG: complete action") }, ::onError)
             }
             Constants.ACTION.STOP_FOREGROUND_ACTION -> {
                 Timber.d("MY_LOG: Stop action")
@@ -82,13 +87,9 @@ class VideoService : Service() {
     private fun handleIntent(intent: Intent) = intent.getStringExtra(EXTRA_PROJECT_ID)
         ?.let { id ->
             repository.getImages(id)
-                .doOnComplete {
-                    stop(this)
-                }.doFinally {
-                    onFinish()
-                }.doOnNext {
-                    imges = it
-                }.flatMapCompletable {
+                .doFinally { onFinish() }
+                .doOnNext { imges = it }
+                .flatMapCompletable {
                     Timber.d("MY_LOG: handleIntent: list_size=%s", it.size)
                     if (intent.getBooleanExtra(EXTRA_IS_GIF, false)) {
                         createGif(imges.first().name)
@@ -96,6 +97,7 @@ class VideoService : Service() {
                         createVideo()
                     }
                 }.doOnComplete {
+                    stop(applicationContext)
                     Timber.d("MY_LOG: complete")
                 }
         }

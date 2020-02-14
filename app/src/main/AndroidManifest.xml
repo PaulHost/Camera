@@ -13,7 +13,7 @@
     <application
         android:name=".App"
         android:allowBackup="true"
-        android:hardwareAccelerated="false"
+        android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
@@ -32,6 +32,7 @@
         <activity
             android:name="paul.host.camera.ui.activity.FastShotActivity"
             android:autoRemoveFromRecents="true" />
+
         <service
             android:name=".service.TimeLapseService"
             android:enabled="true" />

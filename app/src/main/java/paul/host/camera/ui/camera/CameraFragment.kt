@@ -10,15 +10,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import io.fotoapparat.Fotoapparat
-import io.fotoapparat.configuration.CameraConfiguration
-import io.fotoapparat.result.WhenDoneListener
-import io.fotoapparat.selector.*
-import io.fotoapparat.view.CameraRenderer
 import io.fotoapparat.view.FocusView
 import kotlinx.android.synthetic.main.camera_fragment.view.*
 import paul.host.camera.R
 import paul.host.camera.common.Constants
+import paul.host.camera.common.camera.FotoapparatWrapper
 import paul.host.camera.ui.navigation.NavigationFragment
 import timber.log.Timber
 import java.io.File
@@ -39,8 +35,7 @@ private val REQUIRED_PERMISSIONS = arrayOf(
 
 open class CameraFragment : NavigationFragment() {
     internal lateinit var focusView: FocusView
-    internal lateinit var fotoapparat: Fotoapparat
-    internal var activeCamera: Camera = Camera.Back
+    internal lateinit var fotoapparat: FotoapparatWrapper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,10 +43,12 @@ open class CameraFragment : NavigationFragment() {
         savedInstanceState: Bundle?
     ): View? = inflater.inflate(R.layout.camera_fragment, container, false).apply {
         Timber.d("MY_LOG: onCreateView")
+        fotoapparat = FotoapparatWrapper(requireContext())
+        focusView = focus_view
 
-        initFotoapparat(
+        fotoapparat.initCamera(
             view = camera_view,
-            focusView = focus_view
+            focusView = focusView
         )
 
         start_button.setOnClickListener {
@@ -64,19 +61,6 @@ open class CameraFragment : NavigationFragment() {
         } else this@CameraFragment.activity?.let {
             ActivityCompat.requestPermissions(it, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
-    }
-
-    open fun initFotoapparat(view: CameraRenderer, focusView: FocusView) {
-        fotoapparat = Fotoapparat(
-            context = requireContext(),
-            view = view,
-            focusView = focusView,
-            lensPosition = activeCamera.lensPosition,
-            cameraConfiguration = activeCamera.configuration,
-            cameraErrorCallback = { Timber.e(it, "MY_LOG: Camera error:") }
-        )
-
-        this.focusView = focusView
     }
 
     override fun onStart() {
@@ -102,22 +86,7 @@ open class CameraFragment : NavigationFragment() {
         )
     )
 
-    fun changeCamera() {
-        Timber.d("MY_LOG: changeCamera")
-        activeCamera = when (activeCamera) {
-            Camera.Front -> Camera.Back
-            Camera.Back -> Camera.Front
-        }
-        fotoapparat.switchTo(activeCamera)
-    }
-
-    private fun takePicture(file: File) = fotoapparat.takePicture().apply {
-        saveToFile(file).whenDone(object : WhenDoneListener<Unit> {
-            override fun whenDone(it: Unit?) {
-                onImageSaved(file)
-            }
-        })
-    }
+    private fun takePicture(file: File) = fotoapparat.takePicture(file, ::onImageSaved)
 
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>, grantResults: IntArray
@@ -137,49 +106,4 @@ open class CameraFragment : NavigationFragment() {
             requireContext(), it
         ) == PackageManager.PERMISSION_GRANTED
     }
-}
-
-fun Fotoapparat.switchTo(camera: Camera) {
-    switchTo(lensPosition = camera.lensPosition, cameraConfiguration = camera.configuration)
-}
-
-sealed class Camera(
-    val lensPosition: LensPositionSelector,
-    val configuration: CameraConfiguration
-) {
-
-    object Back : Camera(
-        lensPosition = back(),
-        configuration = CameraConfiguration(
-            previewResolution = firstAvailable(
-                wideRatio(highestResolution()),
-                standardRatio(highestResolution())
-            ),
-            previewFpsRange = highestFps(),
-            flashMode = off(),
-            focusMode = firstAvailable(
-                continuousFocusPicture(),
-                autoFocus()
-            ),
-            frameProcessor = {
-                // ToDo something with the preview frame
-            }
-        )
-    )
-
-    object Front : Camera(
-        lensPosition = front(),
-        configuration = CameraConfiguration(
-            previewResolution = firstAvailable(
-                wideRatio(highestResolution()),
-                standardRatio(highestResolution())
-            ),
-            previewFpsRange = highestFps(),
-            flashMode = off(),
-            focusMode = firstAvailable(
-                fixed(),
-                autoFocus()
-            )
-        )
-    )
 }

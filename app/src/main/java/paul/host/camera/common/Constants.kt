@@ -17,8 +17,8 @@ object Constants {
     const val SUCCESSFUL = "Successful"
     const val CHANNEL_ID = "1488"
 
-    object NAMES {
-        const val TIME_LAPSE = "time_lapse_"
+    object DEFAULT {
+        const val MAIN = "main"
     }
 
     object ACTION {
