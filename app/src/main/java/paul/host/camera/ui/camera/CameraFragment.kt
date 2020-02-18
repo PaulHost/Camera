@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.LayoutRes
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import io.fotoapparat.view.FocusView
@@ -35,33 +36,48 @@ private val REQUIRED_PERMISSIONS = arrayOf(
 
 open class CameraFragment : NavigationFragment() {
     internal lateinit var focusView: FocusView
-    internal lateinit var fotoapparat: FotoapparatWrapper
+    private lateinit var fotoapparat: FotoapparatWrapper
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.camera_fragment, container, false).apply {
+    ): View? = inflater.inflateCameraView(R.layout.camera_fragment, container).apply {
         Timber.d("MY_LOG: onCreateView")
-        fotoapparat = FotoapparatWrapper(requireContext())
-        focusView = focus_view
-
-        fotoapparat.initCamera(
-            view = camera_view,
-            focusView = focusView
-        )
-
         start_button.setOnClickListener {
             navigationListener?.goToProjectsListScreen()
         }
-
-        // Request camera permissions
-        if (allPermissionsGranted()) focusView.post {
-            fotoapparat.start()
-        } else this@CameraFragment.activity?.let {
-            ActivityCompat.requestPermissions(it, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
-        }
     }
+
+    /**
+     * Use it only if your layout has
+     * FocusView with @+id/focus_view'
+     * and CameraView with @+id/camera_view'
+     * */
+    internal fun LayoutInflater.inflateCameraView(@LayoutRes resource: Int, container: ViewGroup?): View =
+        inflate(R.layout.camera_fragment, container, false).apply {
+            Timber.d("MY_LOG: inflateCameraView")
+
+            fotoapparat = FotoapparatWrapper(requireContext())
+            focusView = focus_view
+
+            fotoapparat.initCamera(
+                view = camera_view,
+                focusView = focusView
+            )
+
+            // Request camera permissions
+            if (allPermissionsGranted()) focusView.post {
+                fotoapparat.start()
+            } else this@CameraFragment.activity?.let {
+                ActivityCompat.requestPermissions(
+                    it,
+                    REQUIRED_PERMISSIONS,
+                    REQUEST_CODE_PERMISSIONS
+                )
+            }
+        }
+
 
     override fun onStart() {
         super.onStart()
