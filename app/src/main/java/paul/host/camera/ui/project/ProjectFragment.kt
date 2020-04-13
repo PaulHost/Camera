@@ -116,8 +116,9 @@ class ProjectFragment : NavigationFragment() {
     private fun save(function: () -> Unit = {}) = viewModel.save(
         et_name.text.toString(),
         et_interval.text.toString().toInt(),
-        et_count.text.toString().toInt()
-    ).subscribe({ function() }, Timber::e)
+        et_count.text.toString().toInt(),
+        function
+    )
 
 
     private fun deleteProject(function: () -> Unit = {}) =

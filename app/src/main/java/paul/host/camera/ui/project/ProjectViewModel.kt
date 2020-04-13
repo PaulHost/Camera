@@ -9,7 +9,7 @@ import paul.host.camera.common.util.rx.fromIoToMainThread
 import paul.host.camera.common.util.secToMillis
 import paul.host.camera.data.model.ProjectModel
 import paul.host.camera.data.repository.ProjectsRepository
-import paul.host.camera.service.VideoService
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
@@ -33,7 +33,12 @@ class ProjectViewModel : ViewModel() {
     }.fromIoToMainThread()
         .doOnNext { projectModel = it }
 
-    fun save(name: String, interval: Int, count: Int): Completable {
+    fun save(
+        name: String,
+        interval: Int,
+        count: Int,
+        onSave: () -> Unit
+    ) {
         isEdit = false
         projectModel = ProjectModel(
             id = projectId ?: UUID.randomUUID().toString(),
@@ -41,7 +46,9 @@ class ProjectViewModel : ViewModel() {
             interval = interval.secToMillis(),
             count = count
         )
-        return repository.saveProject(projectModel!!).fromIoToMainThread()
+        repository.saveProject(projectModel!!)
+            .fromIoToMainThread()
+            .subscribe({ onSave() }, Timber::e)
     }
 
     fun deleteProject(): Completable = if (projectModel != null) {
