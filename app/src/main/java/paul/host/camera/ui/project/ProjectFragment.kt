@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.*
+import android.widget.EditText
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.project_fragment.*
@@ -29,6 +30,9 @@ class ProjectFragment : NavigationFragment() {
 
     private lateinit var viewModel: ProjectViewModel
     private lateinit var adapter: ImagesAdapter
+    private lateinit var etName: EditText
+    private lateinit var etInterval: EditText
+    private lateinit var etCount: EditText
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -46,6 +50,9 @@ class ProjectFragment : NavigationFragment() {
         images_list.adapter = adapter
         viewModel.isEdit = arguments?.getBoolean(ARG_IS_EDIT) ?: false
         viewModel.projectId = arguments?.getString(ARG_PROJECT_ID)
+        etName = et_name
+        etInterval = et_interval
+        etCount = et_count
         btn_start.setOnClickListener { start() }
     }
 
@@ -105,9 +112,9 @@ class ProjectFragment : NavigationFragment() {
     private fun setProject(project: ProjectModel) {
         val interval = project.interval.millisToSeconds().toString()
         val count = project.count.toString()
-        et_name.setText(project.name)
-        et_interval.setText(interval)
-        et_count.setText(count)
+        etName.setText(project.name)
+        etInterval.setText(interval)
+        etCount.setText(count)
         adapter.setList(project.images)
     }
 

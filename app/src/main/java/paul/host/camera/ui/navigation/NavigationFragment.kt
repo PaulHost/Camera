@@ -6,6 +6,7 @@ import timber.log.Timber
 
 open class NavigationFragment : Fragment() {
     var navigationListener: MainNavigationListener? = null
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is MainNavigationListener) navigationListener = context
