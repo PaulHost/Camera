@@ -1,28 +1,21 @@
 package paul.host.camera.ui.project_list
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
-import android.view.*
-import androidx.lifecycle.ViewModelProviders
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.projects_list_fragment.view.*
 import paul.host.camera.R
-import paul.host.camera.data.model.ProjectModel
 import paul.host.camera.ui.adapter.ProjectsAdapter
 import paul.host.camera.ui.navigation.NavigationFragment
 
 @SuppressLint("CheckResult")
 class ProjectsListFragment : NavigationFragment() {
 
-    private lateinit var viewModel: ProjectsListViewModel
+    private val viewModel by viewModel<ProjectsListViewModel>()
     private lateinit var adapter: ProjectsAdapter
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        viewModel =
-            ViewModelProviders.of(this@ProjectsListFragment).get(ProjectsListViewModel::class.java)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,9 +31,7 @@ class ProjectsListFragment : NavigationFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.getProjects().subscribe(::setProjects, ::onError)
+        viewModel.getProjects().subscribe(adapter::setList, ::onError)
     }
-
-    private fun setProjects(list: List<ProjectModel>) = adapter.setList(list)
 
 }

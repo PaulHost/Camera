@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.lifecycle.ViewModelProviders
 import paul.host.camera.ui.activity.FastShotActivity
 import paul.host.camera.ui.camera.CameraFragment
 import timber.log.Timber
@@ -13,12 +12,11 @@ import java.io.File
 @SuppressLint("CheckResult")
 class FastShotFragment : CameraFragment(), Runnable {
 
-    private lateinit var viewModel: FastShotViewModel
+    private val viewModel by viewModel<FastShotViewModel>()
     private var exposureSeconds: Long? = null
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(FastShotViewModel::class.java)
         val intent = activity?.intent
         viewModel.pictureName = intent?.getStringExtra(ARG_PICTURE_NAME)
         viewModel.projectId = intent?.getStringExtra(ARG_PROJECT_ID)
@@ -33,11 +31,8 @@ class FastShotFragment : CameraFragment(), Runnable {
     override fun run() {
         Timber.d("MY_LOG: run taking picture")
         focusView.removeCallbacks(this)
-        if (fotoapparat.isAvailable(activeCamera.lensPosition)) {
-            takePicture(viewModel.pictureName)
-        } else {
-            focusView.postDelayed(this, PHOTO_DELAY)
-        }
+        if (fotoapparat.isAvailable()) takePicture(viewModel.pictureName)
+        else focusView.postDelayed(this, PHOTO_DELAY)
     }
 
     override fun onImageSaved(file: File) {
@@ -51,7 +46,7 @@ class FastShotFragment : CameraFragment(), Runnable {
         const val ARG_PROJECT_ID = "ARG_PROJECT_ID"
         const val ARG_EXPOSURE = "ARG_EXPOSURE_SEC"
 
-        fun getIntent(
+        private fun getIntent(
             context: Context,
             projectId: String,
             pictureName: String,

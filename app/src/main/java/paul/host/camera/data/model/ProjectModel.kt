@@ -5,7 +5,7 @@ import paul.host.camera.data.db.entity.ProjectEntity
 import java.util.*
 
 class ProjectModel(
-    val id: String,
+    val id: String = UUID.randomUUID().toString(),
     var name: String,
     var removable: Boolean = true,
     var startTime: Long = Constants.ZERO_LONG,

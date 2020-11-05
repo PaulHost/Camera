@@ -18,10 +18,6 @@ class MainNavigationActivity : CameraActivity(), MainNavigationListener {
         navController = Navigation.findNavController(this, R.id.nav_host_fragment)
     }
 
-    override fun goToProjectsListScreen() = navController.navigate(
-        R.id.action_cameraFragment_to_projectsListFragment
-    )
-
     override fun goToProjectFromProjectsList(projectId: String?, isEdit: Boolean) =
         navController.navigate(
             R.id.action_projectsListFragment_to_projectFragment,

@@ -24,16 +24,12 @@ class ProjectsRepository(
                 .toFlowable()
         }
 
-    fun getProject(id: String): Flowable<ProjectModel> =
-        Flowable.zip(
-            projectDao.project(id), imageRepository.getImages(id), createProjectModel()
-        )
+    fun getProject(id: String): Flowable<ProjectModel> = Flowable.zip(
+        projectDao.project(id), imageRepository.getImages(id), createProjectModel()
+    )
 
     fun saveProject(project: ProjectModel): Completable = projectDao.insert(project.toEntity())
         .andThen(imageRepository.saveImages(project.images))
-
-    private fun createProjectModel(): BiFunction<ProjectEntity, List<ImageModel>, ProjectModel> =
-        BiFunction { project, images -> ProjectModel(project, images) }
 
     fun deleteProject(project: ProjectModel): Completable = Completable.concatArray(
         projectDao.delete(project.toEntity()),
@@ -44,5 +40,8 @@ class ProjectsRepository(
             }
         }
     )
+
+    private fun createProjectModel(): BiFunction<ProjectEntity, List<ImageModel>, ProjectModel> =
+        BiFunction { project, images -> ProjectModel(project, images) }
 
 }

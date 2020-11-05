@@ -6,8 +6,8 @@ import paul.host.camera.data.db.dao.ImageDao
 import paul.host.camera.data.model.*
 
 class ImageRepository(private val imageDao: ImageDao) {
-    fun getImages(projectId: String): Flowable<List<ImageModel>> =
-        imageDao.images(projectId).map { it.toImageModel() }
+    fun getImages(projectId: String): Flowable<List<ImageModel>> = imageDao.images(projectId)
+        .map { it.toImageModel() }
 
     fun saveImages(list: List<ImageModel>): Completable = imageDao.insert(list.toImageEntity())
 

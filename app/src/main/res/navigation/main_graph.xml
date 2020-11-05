@@ -3,15 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_graph"
-    app:startDestination="@id/cameraFragment">
+    app:startDestination="@id/projectsListFragment">
 
     <fragment
         android:id="@+id/cameraFragment"
         android:name="paul.host.camera.ui.camera.CameraFragment"
         android:label="CameraFragment">
-        <action
-            android:id="@+id/action_cameraFragment_to_projectsListFragment"
-            app:destination="@id/projectsListFragment" />
         <action
             android:id="@+id/action_cameraFragment_to_imageFragment"
             app:destination="@id/imageFragment" />

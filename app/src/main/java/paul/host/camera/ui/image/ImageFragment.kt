@@ -1,21 +1,19 @@
 package paul.host.camera.ui.image
 
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
 import paul.host.camera.R
+import paul.host.camera.ui.base.BaseFragment
 
-class ImageFragment : Fragment() {
+class ImageFragment : BaseFragment() {
 
     companion object {
         const val ARG_IMAGE_ID = "ARG_IMAGE_ID"
     }
 
-    private lateinit var viewModel: ImageViewModel
+    private val viewModel by viewModel<ImageViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,7 +24,6 @@ class ImageFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(ImageViewModel::class.java)
         // TODO: Use the ViewModel
     }
 

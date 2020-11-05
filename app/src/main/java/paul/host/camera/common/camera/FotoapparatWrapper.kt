@@ -59,4 +59,6 @@ class FotoapparatWrapper(
         )
     }
 
+    fun isAvailable(): Boolean = fotoapparat.isAvailable(camera.lensPosition)
+
 }

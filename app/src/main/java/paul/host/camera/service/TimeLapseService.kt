@@ -56,14 +56,13 @@ open class TimeLapseService : Service(), Runnable {
     @SuppressLint("CheckResult")
     open fun onHandleIntent(intent: Intent?) {
         Timber.d("MY_LOG: onHandleIntent")
-        intent?.getStringExtra(EXTRA_PROJECT_ID)?.let(repository::getProject)?.subscribe({
-            project = ProjectModel(it)
-            if (project.startTime < System.currentTimeMillis()) {
-                handler.post(this)
-            } else {
-                handler.postDelayed(this, project.startTime - System.currentTimeMillis())
-            }
-        }, Timber::e)
+        intent?.getStringExtra(EXTRA_PROJECT_ID)
+            ?.let(repository::getProject)
+            ?.subscribe({
+                project = it
+                if (project.startTime < System.currentTimeMillis()) handler.post(this)
+                else handler.postDelayed(this, project.startTime - System.currentTimeMillis())
+            }, Timber::e)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -103,13 +102,12 @@ open class TimeLapseService : Service(), Runnable {
         return START_STICKY
     }
 
-    open fun takeShot() =
-        FastShotFragment.start(
-            applicationContext,
-            project.id,
-            "${project.name}_${iterator.toImageName(project.count)}",
-            project.exposureTime
-        )
+    open fun takeShot() = FastShotFragment.start(
+        applicationContext,
+        project.id,
+        "${project.name}_${iterator.toImageName(project.count)}",
+        project.exposureTime
+    )
 
     companion object {
         const val EXTRA_PROJECT_ID = "EXTRA_PROJECT_ID"

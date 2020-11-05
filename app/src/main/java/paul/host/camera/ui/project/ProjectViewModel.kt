@@ -26,12 +26,10 @@ class ProjectViewModel : ViewModel() {
         App.component.inject(this)
     }
 
-    fun getProject() = if (projectId != null) {
-        repository.getProject(projectId!!)
-    } else {
-        Flowable.empty()
-    }.fromIoToMainThread()
-        .doOnNext { projectModel = it }
+    fun getProject(): Flowable<ProjectModel> =
+        (if (projectId != null) repository.getProject(projectId!!) else Flowable.empty())
+            .fromIoToMainThread()
+            .doOnNext { projectModel = it }
 
     fun save(
         name: String,

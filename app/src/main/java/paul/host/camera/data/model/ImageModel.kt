@@ -2,9 +2,10 @@ package paul.host.camera.data.model
 
 import paul.host.camera.common.Constants
 import paul.host.camera.data.db.entity.ImageEntity
+import kotlin.random.Random
 
 data class ImageModel(
-    val id: Int? = null,
+    val id: Int = Random.nextInt(Int.MIN_VALUE, Int.MAX_VALUE),
     val name: String = Constants.EMPTY_STRING,
     val projectId: String = Constants.EMPTY_STRING,
     val path: String = Constants.EMPTY_STRING

@@ -1,11 +1,9 @@
 package paul.host.camera.ui.project
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.widget.EditText
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.project_fragment.*
 import kotlinx.android.synthetic.main.project_fragment.view.*
@@ -28,16 +26,12 @@ class ProjectFragment : NavigationFragment() {
         const val ARG_PROJECT_ID = "ARG_PROJECT_ID"
     }
 
-    private lateinit var viewModel: ProjectViewModel
+    private val viewModel by viewModel<ProjectViewModel>()
+
     private lateinit var adapter: ImagesAdapter
     private lateinit var etName: EditText
     private lateinit var etInterval: EditText
     private lateinit var etCount: EditText
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        viewModel = ViewModelProviders.of(this).get(ProjectViewModel::class.java)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
