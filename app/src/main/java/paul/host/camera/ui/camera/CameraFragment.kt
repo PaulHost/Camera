@@ -69,9 +69,9 @@ open class CameraFragment : BaseFragment() {
             // Request camera permissions
             if (allPermissionsGranted()) focusView.post {
                 fotoapparat.start()
-            } else {
+            }else this@CameraFragment.activity?.let {//it is necessary
                 ActivityCompat.requestPermissions(
-                    requireActivity(),
+                    it,
                     REQUIRED_PERMISSIONS,
                     REQUEST_CODE_PERMISSIONS
                 )

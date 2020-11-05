@@ -48,7 +48,7 @@ open class TimeLapseService : Service(), Runnable {
             iterator++
             handler.postDelayed(this, project.interval)
         } else {
-            Timber.d("MY_LOG: stop")
+            Timber.d("MY_LOG: time is out ${project.endTime}")
             application.stopService(getIntent(applicationContext))
         }
     }
@@ -59,7 +59,7 @@ open class TimeLapseService : Service(), Runnable {
         intent?.getStringExtra(EXTRA_PROJECT_ID)
             ?.let(repository::getProject)
             ?.subscribe({
-                project = it
+                project = ProjectModel(it)
                 if (project.startTime < System.currentTimeMillis()) handler.post(this)
                 else handler.postDelayed(this, project.startTime - System.currentTimeMillis())
             }, Timber::e)
