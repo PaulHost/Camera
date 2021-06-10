@@ -14,6 +14,8 @@ fun <T> Single<T>.fromIoToMainThread(): Single<T> = this
     .subscribeOn(Schedulers.io())
     .observeOn(AndroidSchedulers.mainThread())
 
+fun <T> T.toSingle(): Single<T> = Single.just(this)
+
 //Flowable
 
 fun <T> Flowable<T>.fromIoToMainThread(): Flowable<T> = this
@@ -22,6 +24,8 @@ fun <T> Flowable<T>.fromIoToMainThread(): Flowable<T> = this
 
 fun <T> Flowable<T>.newThread(): Flowable<T> = this
     .subscribeOn(Schedulers.newThread())
+
+fun <T> T.toFlowable(): Flowable<T> = Flowable.just(this)
 
 //Completable
 
