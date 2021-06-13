@@ -10,6 +10,7 @@ android {
     defaultConfig {
         applicationId 'paul.host.camera'
         minSdkVersion 24
+        //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 28
         versionCode 1
         versionName '1.0'
@@ -109,4 +110,7 @@ dependencies {
 
     //Gif
     implementation 'com.squareup:gifencoder:0.10.1'
+
+    //Pengrad
+    compileOnly 'com.github.pengrad:jdk9-deps:1.0'
 }
