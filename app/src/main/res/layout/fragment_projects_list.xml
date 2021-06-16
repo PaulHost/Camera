@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data class="ProjectsListBinding">
+
+        <import type="androidx.core.content.ContextCompat" />
+
+        <import type="android.view.View" />
+
+        <import type="paul.host.camera.R" />
+
+        <import type="paul.host.camera.data.model.Status" />
+
+        <variable
+            name="projectsVo"
+            type="paul.host.camera.ui.project_list.ProjectListViewObject" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_mesh"
+        android:orientation="vertical"
+        tools:context=".ui.project_list.ProjectsListFragment">
+
+        <include
+            android:id="@+id/btn_create"
+            layout="@layout/item_create_project" />
+
+        <include
+            android:id="@+id/item_in_progress"
+            layout="@layout/item_openable"
+            android:onClick="@{() -> projectsVo.onInProgressClick()}"
+            android:visibility="@{projectsVo.isInProgressVisible ? View.VISIBLE : View.INVISIBLE}"
+            app:isOpen="@{projectsVo.isInProgressOpen}"
+            app:status="@{Status.IN_PROGRESS}"
+            app:title="@string/in_progress_btn_title" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_in_progress"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="@{projectsVo.isInProgressOpen ? View.VISIBLE : View.INVISIBLE}" />
+
+        <include
+            android:id="@+id/item_completed"
+            layout="@layout/item_openable"
+            android:onClick="@{() -> projectsVo.onCompletedClick()}"
+            android:visibility="@{projectsVo.isCompletedVisible ? View.VISIBLE : View.INVISIBLE}"
+            app:isOpen="@{projectsVo.isCompletedOpen}"
+            app:status="@{Status.COMPLETED}"
+            app:title="@string/completed_btn_title" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_completed"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="@{projectsVo.isCompletedOpen ? View.VISIBLE : View.INVISIBLE}" />
+
+        <include
+            android:id="@+id/item_editable"
+            layout="@layout/item_openable"
+            android:onClick="@{() -> projectsVo.onEditableOnClick()}"
+            android:visibility="@{projectsVo.isEditableVisible ? View.VISIBLE : View.INVISIBLE}"
+            app:isOpen="@{projectsVo.isEditableOpen}"
+            app:status="@{Status.EDITABLE}"
+            app:title="@string/editable_btn_title" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_editable"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="@{projectsVo.isEditableOpen ? View.VISIBLE : View.INVISIBLE}" />
+    </LinearLayout>
+</layout>

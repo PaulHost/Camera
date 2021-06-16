@@ -2,6 +2,7 @@ package paul.host.camera.data.db.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import paul.host.camera.data.model.Status
 
 @Entity(tableName = "projects")
 data class ProjectEntity(
@@ -13,5 +14,6 @@ data class ProjectEntity(
     val interval: Long? = null,
     val count: Int? = null,
     val endTime: Long? = null,
-    val exposureTime: Long? = null
+    val exposureTime: Long? = null,
+    val status: Status = Status.EDITABLE
 )
