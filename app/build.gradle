@@ -120,4 +120,9 @@ dependencies {
     //Parceler
     implementation 'org.parceler:parceler-api:1.1.12'
     kapt 'org.parceler:parceler:1.1.12'
+
+    //JAXB [for java 11 support]
+    api group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+    implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.2'
+    implementation 'javax.activation:activation:1.1'
 }
