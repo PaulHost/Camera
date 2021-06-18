@@ -1,4 +1,4 @@
-package paul.host.lifeidb2b.common.util.databinding
+package paul.host.camera.common.util.databinding
 
 import android.text.Editable
 import android.text.TextWatcher
@@ -6,8 +6,7 @@ import androidx.appcompat.widget.AppCompatAutoCompleteTextView
 import androidx.core.util.Pair
 import androidx.databinding.BindingAdapter
 import com.google.android.material.textfield.TextInputEditText
-import paul.host.camera.common.util.databinding.BindableString
-import paul.host.lifeidb2b.R
+import paul.host.camera.R
 
 object BindingAdapters {
 
