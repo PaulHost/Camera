@@ -15,5 +15,5 @@ data class ProjectEntity(
     val count: Int? = null,
     val endTime: Long? = null,
     val exposureTime: Long? = null,
-    val status: Status = Status.EDITABLE
+    val status: Int = Status.EDITABLE.int
 )

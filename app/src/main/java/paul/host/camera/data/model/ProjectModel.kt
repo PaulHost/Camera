@@ -26,7 +26,7 @@ class ProjectModel(
         endTime = projectEntity?.endTime ?: 0L,
         exposureTime = projectEntity?.exposureTime ?: 0L,
         images = images ?: mutableListOf(),
-        status = projectEntity?.status ?: Status.EDITABLE
+        status = projectEntity?.let { enumValues<Status>()[it.status] } ?: Status.EDITABLE
     )
 
     constructor(project: ProjectModel) : this(
