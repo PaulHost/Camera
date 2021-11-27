@@ -13,7 +13,8 @@ class ProjectModel(
     var count: Int = Constants.ZERO,
     var endTime: Long = Constants.ZERO_LONG,
     var exposureTime: Long = Constants.ZERO_LONG,
-    val images: List<ImageModel> = mutableListOf()
+    val images: List<ImageModel> = mutableListOf(),
+    val status: Status = Status.EDITABLE
 ) {
     constructor(projectEntity: ProjectEntity? = null, images: List<ImageModel>? = null) : this(
         id = projectEntity?.id ?: UUID.randomUUID().toString(),
@@ -24,7 +25,8 @@ class ProjectModel(
         count = projectEntity?.count ?: Constants.ZERO,
         endTime = projectEntity?.endTime ?: 0L,
         exposureTime = projectEntity?.exposureTime ?: 0L,
-        images = images ?: mutableListOf()
+        images = images ?: mutableListOf(),
+        status = projectEntity?.let { enumValues<Status>()[it.status] } ?: Status.EDITABLE
     )
 
     constructor(project: ProjectModel) : this(
@@ -36,7 +38,8 @@ class ProjectModel(
         count = count(project),
         endTime = endTime(project),
         exposureTime = project.exposureTime,
-        images = project.images
+        images = project.images,
+        status = project.status
     )
 
     fun toEntity() = ProjectEntity(

@@ -8,4 +8,8 @@
     <string name="delete_project">Delete project</string>
     <string name="build_video">Build video</string>
     <string name="build_gif">Build GIF</string>
+    <string name="create_project_btn_title">CREATE PROJECT</string>
+    <string name="in_progress_btn_title">IN PROGRESS</string>
+    <string name="completed_btn_title">COMPLETED</string>
+    <string name="editable_btn_title">EDITABLE</string>
 </resources>

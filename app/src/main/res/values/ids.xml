@@ -7,4 +7,5 @@
     <item name="project_menu_delete_with_photo" type="id" />
     <item name="project_menu_build_video" type="id" />
     <item name="project_menu_build_gif" type="id" />
+    <item name="bound_observable" type="id" />
 </resources>
